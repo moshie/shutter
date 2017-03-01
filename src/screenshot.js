@@ -1,5 +1,4 @@
 const shell = require("child_process").spawn;
-const buildId = require('./buildId');
 const Promise = require('bluebird');
 const logger = require('./logger');
 const path = require('path');

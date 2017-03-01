@@ -6,6 +6,11 @@ const screenshot = require('./src/screenshot');
 const compareChunks = require('./src/compareChunks');
 const logger = require('./src/logger');
 
+// const crawler = require('./src/crawler');
+
+// var thing = crawler('http://gristwood.wpengine.com', 10);
+// console.log(thing);
+
 const original = 'http://gristwood.wpengine.com';
 const comparison = 'http://gristwoodandtoms.co.uk';
 
@@ -24,14 +29,15 @@ var paths = [
 
 paths = paths.filter((path, index) => paths.indexOf(path) == index); // Remove Dups
 
-var chunks = _.chunk(paths, 5); // Chunk paths
+var chunks = _.chunk(paths, 6); // Chunk paths
 
 Promise.map(chunks, (chunk, index) => {
-    return fs.writeFileAsync(`chunk-${index}.json`, JSON.stringify(chunk))
+    let chunkFile = `chunk-${index}.json`;
+    return fs.writeFileAsync(chunkFile, JSON.stringify(chunk))
         .then((response) => {
                 return Promise.join(
-                    screenshot(`chunk-${index}.json`, original, 'original'),
-                    screenshot(`chunk-${index}.json`, comparison, 'comparison'),
+                    screenshot(chunkFile, original, 'original'),
+                    screenshot(chunkFile, comparison, 'comparison'),
                     compareChunks
                 )
                 .catch((error) => {
@@ -39,7 +45,7 @@ Promise.map(chunks, (chunk, index) => {
                 });
         })
         .then(() => {
-            return fs.unlinkAsync(`chunk-${index}.json`);
+            return fs.unlinkAsync(chunkFile);
         })
 }, {concurrency: 5})
     .then(() => {
