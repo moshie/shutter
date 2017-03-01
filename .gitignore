@@ -1,0 +1,8 @@
+/node_modules/
+.DS_Store
+.db_thumbs
+/.sass-cache
+/.idea
+/screenshots
+/comparisons/*.jpg
+/comparisons/*.png
