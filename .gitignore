@@ -6,3 +6,5 @@
 /screenshots
 /comparisons/*.jpg
 /comparisons/*.png
+chunk-*.json
+npm-debug.log

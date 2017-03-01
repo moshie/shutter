@@ -1,6 +1,9 @@
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
-const _ = require('lodash');
+
+Object.defineProperty(Array.prototype, 'chunk', {value: function(n) {
+    return Array.from(Array(Math.ceil(this.length/n)), (_,i)=>this.slice(i*n,i*n+n));
+}});
 
 const screenshot = require('./src/screenshot');
 const compareChunks = require('./src/compareChunks');
@@ -29,7 +32,8 @@ var paths = [
 
 paths = paths.filter((path, index) => paths.indexOf(path) == index); // Remove Dups
 
-var chunks = _.chunk(paths, 6); // Chunk paths
+var chunks = paths.chunk(6);
+
 
 Promise.map(chunks, (chunk, index) => {
     let chunkFile = `chunk-${index}.json`;
