@@ -1,77 +1,54 @@
-import screenshot from './screenshot'
+import {environmentsInterface} from './environments-interface'
+import writeChunkToFile from './write-chunk-to-file'
+import multiShot from './multi-shot'
+import chunk from './chunk'
+
 import * as Promise from 'bluebird'
+import * as fileSystem from 'fs'
+const fs: any = Promise.promisifyAll(fileSystem)
 
-// screenshot master https://www.google.com/ copy https://dev.google.com/ test https://test.google.com/
-
+// TBA
 // compare copy master
 
 
-// var environments = {
-// 	'master': 'https://google.com/',
-// 	'develop': 'https://dev.google.com/',
-// 	'test': 'https://test.google.com/'
-// }
+// screenshot master https://www.google.com/ copy https://dev.google.com/ test https://test.google.com/
+
+
+const environments: environmentsInterface = {
+	'master': 'https://www.serentipi.co.uk',
+	'develop': 'https://www.serentipi.co.uk',
+	'test': 'https://www.serentipi.co.uk'
+}
 
 // Crawl first domain get back list of paths
 
-// var paths = [
-// 	'/home',
-// 	'/about',
-// 	'/contact',
-// 	'/home',
-// 	'/about',
-// 	'/contact',
-// 	'/home',
-// 	'/about',
-// 	'/contact',
-// 	'/home',
-// 	'/about',
-// 	'/contact'
-// ];
+const paths: string[] = [
+	'/',
+	'/contact/',
+	'/home',
+	'/your-event/',
+	'/weddings/',
+	'/corporate/',
+	'/private-functions/',
+	'/our-story',
+	'/gallery/',
+	'/friends-venues/',
+	'/open-days/',
+	'/quote-me/'
+]
 
-// Chunk paths `import chunk from './chunk'`
+// Chunk paths 
 
-// [
-// 	['/home',
-// 	'/about',
-// 	'/contact'],
-// 	['/home',
-// 	'/about',
-// 	'/contact'],
-// 	['/home',
-// 	'/about',
-// 	'/contact']
-// ]
+const chunks: string[][] = chunk(paths, 6);
 
+// loop through each chunk add it to a file `chunk-{index}.json` then for each environment run screenshot:
 
-// loop through chunks for each environment add them to a file `chunk-{index}.json` run screenshot:
-
-
-// Promise.map(chunks, (chunk, index) => {
-// 	fs.writeAsync(`chunk-${index}`, JSON.stringify(chunk))
-// 		.then((chunkFilename) => {
-// 			var promises = [];
-// 			Object.keys(environments).forEach((env) => {
-// 				var domain = environments[env];
-// 				promises.push(
-// 					screenshot(chunkFilename, domain, environment)
-// 				)
-// 			})
-
-// 			return Promise.join(promises)
-// 		})
-// }, {concurrency: 6})
-
-var domain: string = 'https://www.serentipi.co.uk';
-var environment: string = 'master';
-
-Promise.join(
-	screenshot(__dirname + '/chunk-0.json', domain, 'master'), 
-	screenshot(__dirname + '/chunk-0.json', domain, 'test')
-)
-	.then((response: any) => {
-		console.log(response);
-	})
+Promise.map(chunks, (chunk: string[], index: number) => {
+	let filename: string = `chunk-${index}.json`;
+	writeChunkToFile(filename, JSON.stringify(chunk))
+		.then((chunkFilename: string) => multiShot(environments, chunkFilename))
+		.then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
+}, {concurrency: 6})
 	.catch((errors: any) => {
 		console.log(errors)
 	})

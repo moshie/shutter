@@ -37,7 +37,7 @@ else {
     phantom.exit();
 }
 if (!Array.isArray(paths)) {
-    console.log('paths content must be a type of [Object array]');
+    console.error('paths content must be a type of [Object array]');
 }
 var page_width = 1600;
 var page_height = 1800;

@@ -1,0 +1,1 @@
+{"version":3,"file":"environments-interface.js","sourceRoot":"","sources":["../src/environments-interface.ts"],"names":[],"mappings":"","sourcesContent":["export interface environmentsInterface {\n\t[key: string]: string\n}"]}

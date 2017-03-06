@@ -47,7 +47,7 @@ if (isJson(rawPaths)) {
 }
 
 if (!Array.isArray(paths)) {
-    console.log('paths content must be a type of [Object array]')
+    console.error('paths content must be a type of [Object array]')
 }
 
 const page_width = 1600
@@ -73,6 +73,7 @@ function handlePage() {
             nextPage()
         }
 
+        // This needs work!
 
         // Set page height
         // var height: number = page.evaluate(() => {
@@ -108,7 +109,7 @@ function nextPage() {
         phantom.exit()
     }
 
-    handlePage() // https://www.google.com/ < do a check for the trailing slash
+    handlePage()
 }
 
 nextPage()
