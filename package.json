@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha --opts mocha.opts && rm -rf test",
     "test:auto": "mocha --opts mocha.opts --watch",
-    "start": "ts-node src/index.ts"
+    "watch": "tsc -w",
+    "start": "node dist/index.js"
   },
   "keywords": [
     "screenshot",
@@ -20,10 +21,18 @@
     "@types/mocha": "^2.2.39",
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
+    "mock-fs": "^4.1.0",
     "ts-node": "^2.1.0"
   },
   "dependencies": {
+    "@types/bluebird": "^3.0.37",
     "@types/node": "^7.0.5",
-    "typescript": "^2.2.1"
+    "@types/phantomjs": "^1.9.29",
+    "bluebird": "^3.4.7",
+    "cheerio": "^0.22.0",
+    "phantomjs": "^2.1.7",
+    "request": "^2.79.0",
+    "typescript": "^2.2.1",
+    "winston": "^2.3.1"
   }
 }

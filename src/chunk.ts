@@ -1,4 +1,4 @@
-export default function chunk(array: any[], size: number): any[][] {
+function chunk(array: any[], size: number): any[][] {
     let chunks: any[][] = []
 
     for (let i: number = 0; i < array.length; i += size) {
@@ -7,3 +7,5 @@ export default function chunk(array: any[], size: number): any[][] {
 
     return chunks
 }
+
+export default chunk

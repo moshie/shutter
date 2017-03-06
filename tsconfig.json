@@ -1,12 +1,27 @@
 {
     "compilerOptions": {
+        "target": "es5",
+        "outDir": "dist",
         "module": "commonjs",
-        "target": "es6",
-        "noImplicitAny": false,
+        "declaration": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "removeComments": true,
+        "moduleResolution": "node",
         "sourceMap": true,
-        "outDir": "build"
+        "inlineSources": true
     },
     "exclude": [
         "node_modules"
+    ],
+    "files": [
+        //"src/chunk.ts",
+        "src/index.ts",
+        "src/has-read-access.ts",
+        "src/is-json.ts",
+        "src/screenshot.ts",
+        "src/phantom-shell.ts",
+        "src/sanitize-path.ts",
+        "src/screenshot.phantomjs.ts"
     ]
 }
