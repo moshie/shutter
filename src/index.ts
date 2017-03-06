@@ -43,15 +43,12 @@ const chunks: string[][] = chunk(paths, 6);
 
 // loop through each chunk add it to a file `chunk-{index}.json` then for each environment run screenshot:
 
-Promise.map(chunks, (chunk: string[], index: number) => {
+Promise.map(chunks, (chunk: string[], index: number): Promise<string> => {
 	let filename: string = `chunk-${index}.json`;
-	writeChunkToFile(filename, JSON.stringify(chunk))
+	return writeChunkToFile(filename, JSON.stringify(chunk))
 		.then((chunkFilename: string) => multiShot(environments, chunkFilename))
 		.then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
 }, {concurrency: 6})
 	.catch((errors: any) => {
 		console.log(errors)
 	})
-
-
-
