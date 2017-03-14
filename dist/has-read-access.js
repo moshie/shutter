@@ -1,14 +1,14 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var Promise = require("bluebird");
 var fsA = Promise.promisifyAll(fs);
-function hasReadAccess(chunkFilepath) {
-    return fsA.accessAsync(chunkFilepath, fs.constants.F_OK | fs.constants.R_OK)
-        .then(function () { return chunkFilepath; })
+function hasReadAccess(filepath) {
+    return fsA.accessAsync(filepath, fs.constants.F_OK | fs.constants.R_OK)
+        .then(function () { return filepath; })
         .catch(function (error) {
-        return "No Read access to " + chunkFilepath;
+        return "No Read access to " + filepath;
     });
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = hasReadAccess;
 //# sourceMappingURL=has-read-access.js.map

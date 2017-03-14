@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Promise = require("bluebird");
 var fileSystem = require("fs");
 var fs = Promise.promisifyAll(fileSystem);
@@ -9,6 +10,5 @@ function writeChunkToFile(filename, contents) {
         console.log(error);
     });
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = writeChunkToFile;
 //# sourceMappingURL=write-chunk-to-file.js.map

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var has_read_access_1 = require("./has-read-access");
 var phantom_shell_1 = require("./phantom-shell");
 function screenshot(chunkFilepath, domain, environment) {
@@ -10,6 +11,5 @@ function screenshot(chunkFilepath, domain, environment) {
         console.log(error);
     });
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = screenshot;
 //# sourceMappingURL=screenshot.js.map

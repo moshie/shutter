@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var webpage = require("webpage");
 var system = require("system");
 var fs = require("fs");

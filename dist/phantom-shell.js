@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var child_process_1 = require("child_process");
 var Promise = require("bluebird");
 var is_json_1 = require("./is-json");
@@ -28,6 +29,5 @@ function screenshot(chunkFilepath, domain, environment) {
         });
     });
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = screenshot;
 //# sourceMappingURL=phantom-shell.js.map

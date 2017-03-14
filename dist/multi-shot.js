@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var screenshot_1 = require("./screenshot");
 var Promise = require("bluebird");
 var fileSystem = require("fs");
@@ -13,6 +14,5 @@ function multiShot(environments, chunkFilename) {
         console.log(errors);
     });
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = multiShot;
 //# sourceMappingURL=multi-shot.js.map

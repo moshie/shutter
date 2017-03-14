@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function chunk(array, size) {
     var chunks = [];
     for (var i = 0; i < array.length; i += size) {
@@ -6,6 +7,5 @@ function chunk(array, size) {
     }
     return chunks;
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = chunk;
 //# sourceMappingURL=chunk.js.map
