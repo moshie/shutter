@@ -15,9 +15,14 @@ import * as fileSystem from 'fs'
 const fs: any = Promise.promisifyAll(fileSystem)
 const version = require('../package.json').version;
 
+// `shutter screenshots master=https://google.com development=https://dev.google.com test=https://test.google.com —config=~/config.yaml` <- config for predefined paths & other stuff
+// `shutter compare master development` <— will compare “prescreenshoted” sites
+// `shutter compare https://google.com https://dev.google.com` <— will crawl site, take screenshots then compare them
+
 program
     .version(version)
-    .command('shot [domains...]')
+    .command('screenshots [domains...] Pass in your ')
+    .arguments('-c, --config')
     .action(function (domains) {
         console.log(domains);
         // validate 

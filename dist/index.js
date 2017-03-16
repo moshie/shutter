@@ -8,7 +8,8 @@ var fs = Promise.promisifyAll(fileSystem);
 var version = require('../package.json').version;
 program
     .version(version)
-    .command('shot [domains...]')
+    .command('screenshots [domains...] Pass in your ')
+    .arguments('-c, --config')
     .action(function (domains) {
     console.log(domains);
     if (domains.length % 2 !== 0) {
