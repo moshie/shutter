@@ -1,9 +1,10 @@
-import * as webpage from 'webpage'
-import * as system from 'system'
-import * as fs from 'fs'
+// Phantomjs doesn't like the way typescript compiles es6 module imports
+const webpage = require('webpage');
+const system = require('system');
+const fs = require('fs');
 
-import isJson from './is-json'
-import sanitizePath from './sanitize-path'
+const isJson = require('./is-json').default;
+const sanitizePath = require('./sanitize-path').default;
 
 var page: any = webpage.create()
 
@@ -37,7 +38,7 @@ if (!rawPaths) {
     phantom.exit()
 }
 
-var paths: string[]
+var paths: string[] = [];
 
 if (isJson(rawPaths)) {
     paths = JSON.parse(rawPaths)
@@ -55,7 +56,19 @@ const page_height = 1800
 
 page.viewportSize = { width: page_width, height: page_height }
 page.clipRect = { top: 0, left: 0, width: page_width, height: page_height }
-page.onError = (messageStack: string, trace: string|any[]) => {}
+page.settings.resourceTimeout = 10000;
+page.onError = function(msg: string, trace: string|any[]) {}
+phantom.onError = function(msg, trace) {
+    var msgStack = ['PHANTOM ERROR: ' + msg];
+    if (trace && trace.length) {
+        msgStack.push('TRACE:');
+        trace.forEach(function(t: any) {
+            msgStack.push(' -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function +')' : ''));
+        });
+    }
+    console.error(msgStack.join('\n'));
+    phantom.exit(1);
+};
 
 var pathCollection: string[] = []
 
@@ -93,11 +106,14 @@ function handlePage() {
         // page.clipRect['height'] = height
 
         var id: string = sanitizePath(paths[count])
-        var output: string = `screenshots/${environment}/${id}_${page_width}x${page_height}.png`
+        var output: string = `${fs.workingDirectory}/${environment}/${id}_${page_width}x${page_height}.png`
 		
-        page.render(output)
+        try {
+            page.render(output)
+        } catch (e) {
+            console.error(e);
+        }
         pathCollection.push(output)
-
 		count++
         nextPage()
     })

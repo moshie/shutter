@@ -17,10 +17,7 @@
     "files": [
         //"src/chunk.ts",
         "src/index.ts",
-        "src/has-read-access.ts",
         "src/is-json.ts",
-        "src/screenshot.ts",
-        "src/phantom-shell.ts",
         "src/sanitize-path.ts",
         "src/screenshot.phantomjs.ts"
     ]

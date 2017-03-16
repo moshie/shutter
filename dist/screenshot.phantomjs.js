@@ -1,10 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var webpage = require("webpage");
-var system = require("system");
-var fs = require("fs");
-var is_json_1 = require("./is-json");
-var sanitize_path_1 = require("./sanitize-path");
+var webpage = require('webpage');
+var system = require('system');
+var fs = require('fs');
+var isJson = require('./is-json').default;
+var sanitizePath = require('./sanitize-path').default;
 var page = webpage.create();
 console.error = function (error) {
     system.stderr.write(error + '\n');
@@ -29,8 +27,8 @@ if (!rawPaths) {
     console.error('No content found inside ' + pathsFilepath);
     phantom.exit();
 }
-var paths;
-if (is_json_1.default(rawPaths)) {
+var paths = [];
+if (isJson(rawPaths)) {
     paths = JSON.parse(rawPaths);
 }
 else {
@@ -44,7 +42,19 @@ var page_width = 1600;
 var page_height = 1800;
 page.viewportSize = { width: page_width, height: page_height };
 page.clipRect = { top: 0, left: 0, width: page_width, height: page_height };
-page.onError = function (messageStack, trace) { };
+page.settings.resourceTimeout = 10000;
+page.onError = function (msg, trace) { };
+phantom.onError = function (msg, trace) {
+    var msgStack = ['PHANTOM ERROR: ' + msg];
+    if (trace && trace.length) {
+        msgStack.push('TRACE:');
+        trace.forEach(function (t) {
+            msgStack.push(' -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function + ')' : ''));
+        });
+    }
+    console.error(msgStack.join('\n'));
+    phantom.exit(1);
+};
 var pathCollection = [];
 var count = 0;
 function handlePage() {
@@ -55,9 +65,14 @@ function handlePage() {
             console.error('Failed loading: ' + url);
             nextPage();
         }
-        var id = sanitize_path_1.default(paths[count]);
-        var output = "screenshots/" + environment + "/" + id + "_" + page_width + "x" + page_height + ".png";
-        page.render(output);
+        var id = sanitizePath(paths[count]);
+        var output = fs.workingDirectory + "/" + environment + "/" + id + "_" + page_width + "x" + page_height + ".png";
+        try {
+            page.render(output);
+        }
+        catch (e) {
+            console.error(e);
+        }
         pathCollection.push(output);
         count++;
         nextPage();

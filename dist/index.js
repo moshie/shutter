@@ -1,44 +1,20 @@
+#!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var path = require("path");
+var program = require("commander");
 var Promise = require("bluebird");
 var fileSystem = require("fs");
 var fs = Promise.promisifyAll(fileSystem);
-var cwd = process.cwd();
-var comparisonOne = path.join(cwd, 'develop');
-var comparisonTwo = path.join(cwd, 'master');
-function checkPathsAreDirectories() {
-    var paths = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        paths[_i] = arguments[_i];
+var version = require('../package.json').version;
+program
+    .version(version)
+    .command('shot [domains...]')
+    .action(function (domains) {
+    console.log(domains);
+    if (domains.length % 2 !== 0) {
+        console.log('please specify ');
+        process.exit(1);
     }
-    return new Promise(function (resolve, reject) {
-        Promise.map(paths, function (path) {
-            return fs.statAsync(path)
-                .then(function (stat) { return stat.isDirectory(); })
-                .catch(function (error) {
-                if (error.code == 'ENOENT') {
-                    return false;
-                }
-                reject(error);
-            });
-        })
-            .then(function (validation) {
-            var failureIndex = validation.indexOf(false);
-            if (failureIndex !== -1) {
-                reject(paths[failureIndex] + " is not a directory");
-            }
-            else {
-                resolve(paths);
-            }
-        });
-    });
-}
-checkPathsAreDirectories(cwd, comparisonOne, comparisonTwo)
-    .then(function (paths) {
-    console.log(paths);
-})
-    .catch(function (error) {
-    console.log(error);
 });
+program.parse(process.argv);
 //# sourceMappingURL=index.js.map
