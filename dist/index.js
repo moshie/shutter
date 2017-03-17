@@ -2,19 +2,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var program = require("commander");
-var write_chunk_to_file_1 = require("./write-chunk-to-file");
-var multi_shot_1 = require("./multi-shot");
-var chunk_1 = require("./chunk");
-var check_paths_are_directories_1 = require("./check-paths-are-directories");
-var folder_comparison_1 = require("./folder-comparison");
-var make_comparison_folder_1 = require("./make-comparison-folder");
 var path = require("path");
 var Promise = require("bluebird");
 var fileSystem = require("fs");
 var fs = Promise.promisifyAll(fileSystem);
-var version = require('../package.json').version;
+var chunk_1 = require("./chunk");
+var multi_shot_1 = require("./multi-shot");
+var folder_comparison_1 = require("./folder-comparison");
 var validation_1 = require("./validation");
+var write_chunk_to_file_1 = require("./write-chunk-to-file");
 var sanitize_environments_1 = require("./sanitize-environments");
+var make_comparison_folder_1 = require("./make-comparison-folder");
+var check_paths_are_directories_1 = require("./check-paths-are-directories");
+var version = require('../package').version;
 program
     .version(version)
     .command('screenshots [domains...]')

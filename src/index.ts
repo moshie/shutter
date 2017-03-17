@@ -2,26 +2,22 @@
 
 import * as program from 'commander'
 import {environmentsInterface} from './environments-interface'
-import writeChunkToFile from './write-chunk-to-file'
-import multiShot from './multi-shot'
-import chunk from './chunk'
-import checkPathsAreDirectories from './check-paths-are-directories'
-import folderComparison from './folder-comparison'
-import makeComparisonFolder from './make-comparison-folder'
-
 import * as path from 'path'
 import * as Promise from 'bluebird'
 import * as fileSystem from 'fs'
 const fs: any = Promise.promisifyAll(fileSystem)
-const version = require('../package.json').version;
 
-// `shutter screenshots master=https://google.com development=https://dev.google.com test=https://test.google.com —config=~/config.yaml` <- config for predefined paths & other stuff
-
-
-
-
+import chunk from './chunk'
+import multiShot from './multi-shot'
+import folderComparison from './folder-comparison'
 import {screenShotsValidation} from './validation'
+import writeChunkToFile from './write-chunk-to-file'
 import sanitizeEnvironments from './sanitize-environments'
+import makeComparisonFolder from './make-comparison-folder'
+import checkPathsAreDirectories from './check-paths-are-directories'
+const version = require('../package').version;
+
+// `shutter screenshots master=https://google.com development=https://dev.google.com test=https://test.google.com —config=~/config.yaml`
 
 program
     .version(version)
@@ -77,6 +73,8 @@ program
     program
         .command('compare <original> <comparison>')
         .action(function (original, comparison) {
+            // Check if urls or paths!!
+
             const cwd = process.cwd();
             const comparisonOne = path.join(cwd, original);
             const comparisonTwo = path.join(cwd, comparison);
@@ -91,16 +89,3 @@ program
 
 
 program.parse(process.argv);
-
-
-// compare copy master
-
-// CLI Validation must supply 2 paths to compare!
-
-
-
-
-
-
-
-
