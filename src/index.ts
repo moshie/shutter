@@ -19,20 +19,56 @@ const version = require('../package.json').version;
 // `shutter compare master development` <— will compare “prescreenshoted” sites
 // `shutter compare https://google.com https://dev.google.com` <— will crawl site, take screenshots then compare them
 
+
+import {screenShotsValidation} from './validation'
+import sanitizeEnvironments from './sanitize-environments'
+
 program
     .version(version)
-    .command('screenshots [domains...] Pass in your ')
+    .command('screenshots [domains...]')
     .arguments('-c, --config')
-    .action(function (domains) {
-        console.log(domains);
-        // validate 
+    .action(function (domains: string[]) {
+        screenShotsValidation(domains)
+        const environments: environmentsInterface = sanitizeEnvironments(domains)
 
-        if (domains.length % 2 !== 0) {
-            console.log('please specify ')
-            process.exit(1);
-        }
+        const paths: string[] = [
+            '',
+            'contact-us',
+            'why-choose-us',
+            'why-choose-us/faqs',
+            'product-category/printing',
+            'product-category/litho-and-digital-printing',
+            'product-category/printing/large-format-printing',
+            'product-category/printing/business-stationery',
+            'product-category/printing/brochure-printing-services',
+            'product-category/printing/print-processes',
+            'product-category/print-sizes',
+            'product-category/promotional-products',
+            'branded-pens',
+            'artwork',
+            'office-furniture',
+            'signs-displays',
+            'exhibition-stand-ideas',
+            'exhibition-stands',
+            'exhibitions',
+            'exhibitions/pop-up-banners'
+        ]
 
-        
+        // Chunk paths 
+
+        const chunks: string[][] = chunk(paths, 6);
+
+        // loop through each chunk add it to a file `chunk-{index}.json` then for each environment run screenshot:
+
+        Promise.map(chunks, (chunk: string[], index: number): Promise<string> => {
+            let filename: string = path.join(__dirname, `chunk-${index}.json`);
+            return writeChunkToFile(filename, JSON.stringify(chunk))
+                .then((chunkFilename: string) => multiShot(environments, chunkFilename))
+                .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
+        }, {concurrency: 6})
+            .catch((error: any) => {
+                console.log(error)
+            })
     })
 
 
@@ -56,44 +92,6 @@ program.parse(process.argv);
 
 
 
-// screenshot master https://www.google.com/ copy https://dev.google.com/ test https://test.google.com/
 
 
-// const environments: environmentsInterface = {
-//     'master': 'https://www.serentipi.co.uk',
-//     'develop': 'https://www.serentipi.co.uk',
-//     'test': 'https://www.serentipi.co.uk'
-// }
 
-// // Crawl first domain get back list of paths
-
-// const paths: string[] = [
-//     '/',
-//     '/contact/',
-//     '/home',
-//     '/your-event/',
-//     '/weddings/',
-//     '/corporate/',
-//     '/private-functions/',
-//     '/our-story',
-//     '/gallery/',
-//     '/friends-venues/',
-//     '/open-days/',
-//     '/quote-me/'
-// ]
-
-// // Chunk paths 
-
-// const chunks: string[][] = chunk(paths, 6);
-
-// // loop through each chunk add it to a file `chunk-{index}.json` then for each environment run screenshot:
-
-// Promise.map(chunks, (chunk: string[], index: number): Promise<string> => {
-//     let filename: string = path.join(__dirname, `chunk-${index}.json`);
-//     return writeChunkToFile(filename, JSON.stringify(chunk))
-//         .then((chunkFilename: string) => multiShot(environments, chunkFilename))
-//         .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
-// }, {concurrency: 6})
-//     .catch((error: any) => {
-//         console.log(error)
-//     })
