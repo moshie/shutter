@@ -5,6 +5,9 @@ var program = require("commander");
 var write_chunk_to_file_1 = require("./write-chunk-to-file");
 var multi_shot_1 = require("./multi-shot");
 var chunk_1 = require("./chunk");
+var check_paths_are_directories_1 = require("./check-paths-are-directories");
+var folder_comparison_1 = require("./folder-comparison");
+var make_comparison_folder_1 = require("./make-comparison-folder");
 var path = require("path");
 var Promise = require("bluebird");
 var fileSystem = require("fs");
@@ -48,6 +51,19 @@ program
             .then(function (chunkFilename) { return multi_shot_1.default(environments, chunkFilename); })
             .then(function (chunkFilename) { return fs.unlinkAsync(chunkFilename); });
     }, { concurrency: 6 })
+        .catch(function (error) {
+        console.log(error);
+    });
+});
+program
+    .command('compare <original> <comparison>')
+    .action(function (original, comparison) {
+    var cwd = process.cwd();
+    var comparisonOne = path.join(cwd, original);
+    var comparisonTwo = path.join(cwd, comparison);
+    check_paths_are_directories_1.default(comparisonOne, comparisonTwo)
+        .then(function () { return make_comparison_folder_1.default(comparisonOne, comparisonTwo); })
+        .then(function () { return folder_comparison_1.default(comparisonOne, comparisonTwo); })
         .catch(function (error) {
         console.log(error);
     });

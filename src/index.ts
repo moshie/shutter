@@ -16,8 +16,8 @@ const fs: any = Promise.promisifyAll(fileSystem)
 const version = require('../package.json').version;
 
 // `shutter screenshots master=https://google.com development=https://dev.google.com test=https://test.google.com —config=~/config.yaml` <- config for predefined paths & other stuff
-// `shutter compare master development` <— will compare “prescreenshoted” sites
-// `shutter compare https://google.com https://dev.google.com` <— will crawl site, take screenshots then compare them
+
+
 
 
 import {screenShotsValidation} from './validation'
@@ -71,6 +71,24 @@ program
             })
     })
 
+    // `shutter compare master development` <— will compare “prescreenshoted” sites
+    // `shutter compare https://google.com https://dev.google.com` <— will crawl site, take screenshots then compare them
+
+    program
+        .command('compare <original> <comparison>')
+        .action(function (original, comparison) {
+            const cwd = process.cwd();
+            const comparisonOne = path.join(cwd, original);
+            const comparisonTwo = path.join(cwd, comparison);
+
+            checkPathsAreDirectories(comparisonOne, comparisonTwo)
+                .then(() => makeComparisonFolder(comparisonOne, comparisonTwo))
+                .then(() => folderComparison(comparisonOne, comparisonTwo))
+                .catch((error) => {
+                    console.log(error);
+                });
+        })
+
 
 program.parse(process.argv);
 
@@ -79,16 +97,7 @@ program.parse(process.argv);
 
 // CLI Validation must supply 2 paths to compare!
 
-// const cwd = process.cwd();
-// const comparisonOne = path.join(cwd, 'develop');
-// const comparisonTwo = path.join(cwd, 'master');
 
-// checkPathsAreDirectories(comparisonOne, comparisonTwo)
-//     .then(() => makeComparisonFolder(comparisonOne, comparisonTwo))
-//     .then(() => folderComparison(comparisonOne, comparisonTwo))
-//     .catch((error) => {
-//         console.log(error);
-//     });
 
 
 
