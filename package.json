@@ -35,11 +35,9 @@
     "@types/phantomjs": "^1.9.29",
     "blink-diff": "^1.0.13",
     "bluebird": "^3.4.7",
-    "cheerio": "^0.22.0",
     "commander": "^2.9.0",
+    "node-spider": "^1.4.1",
     "phantomjs": "^2.1.7",
-    "request": "^2.80.0",
-    "typescript": "^2.2.1",
-    "winston": "^2.3.1"
+    "typescript": "^2.2.1"
   }
 }
