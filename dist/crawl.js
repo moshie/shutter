@@ -7,27 +7,28 @@ var paths = [];
 function handleRequest(spider, doc, domain) {
     doc.$("a[href]").each(function (i, elem) {
         var href = doc.$(elem).attr('href');
+        var relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)');
+        var forwardSlash = new RegExp('^(\/)');
+        if (!relativeRegex.test(href) && paths.indexOf(href) !== -1) {
+            return true;
+        }
+        if (forwardSlash.test(href)) {
+            href = href.slice(1);
+            var next = URL.format(domain) + href.slice(1);
+        }
+        else {
+            var next = href;
+            href = URL.parse(href).pathname;
+            href = typeof href == 'string' && href.length ? href.slice(1) : '';
+        }
         if (paths.indexOf(href) !== -1) {
             return true;
         }
-        var relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)');
-        var forwardSlash = new RegExp('^(\/)');
-        if (relativeRegex.test(href)) {
-            if (forwardSlash.test(href)) {
-                href = href.slice(1);
-                var next = URL.format(domain) + href.slice(1);
-            }
-            else {
-                var next = href;
-                href = URL.parse(href).pathname;
-                href = typeof href !== 'undefined' && href !== '' ? href.slice(1) : '';
-            }
-            if (paths.indexOf(href) !== -1) {
-                return true;
-            }
-            paths.push(href);
-            spider.queue(next, function (doc) { return handleRequest(spider, doc, domain); });
+        paths.push(href);
+        if (paths.length == 300) {
+            return;
         }
+        spider.queue(next, function (doc) { return handleRequest(spider, doc, domain); });
     });
 }
 function crawl(environments) {
@@ -36,6 +37,7 @@ function crawl(environments) {
     return new Promise(function (resolve, reject) {
         var spider = new Spider({
             concurrent: 5,
+            error: function (error, url) { return reject(error); },
             done: function () { return resolve(paths); }
         });
         spider.queue(URL.format(domain), function (doc) { return handleRequest(spider, doc, domain); });

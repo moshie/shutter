@@ -16,10 +16,6 @@ import sanitizeEnvironments from './sanitize-environments'
 import makeComparisonFolder from './make-comparison-folder'
 import checkPathsAreDirectories from './check-paths-are-directories'
 const version = require('../package').version;
-
-
-
-import * as URL from 'url'
 import crawl from './crawl'
 
 // `shutter screenshots master=https://google.com development=https://dev.google.com test=https://test.google.com —config=~/config.yaml`
@@ -32,18 +28,25 @@ program
         screenShotsValidation(domains)
         const environments: environmentsInterface = sanitizeEnvironments(domains)
 
-    	// Ideal setup below
-    	crawl(environments)
-    		.then((paths: string[]) => chunk(paths, 6))
-    		.map((chunk: string[], index: number): Promise<string> => {
-            let filename: string = path.join(__dirname, `chunk-${index}.json`);
-            return writeChunkToFile(filename, JSON.stringify(chunk))
-                .then((chunkFilename: string) => multiShot(environments, chunkFilename))
-                .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
-        }, {concurrency: 6})
-            .catch((error: any) => {
-                console.log(error)
+        crawl(environments)
+            .then((paths: string[]) => {
+                console.log(paths);
             })
+            .catch((err) => {
+                console.log(err);
+            })
+
+    	// crawl(environments)
+    	// 	.then((paths: string[]) => chunk(paths, 6))
+    	// 	.map((chunk: string[], index: number): Promise<string> => {
+     //        let filename: string = path.join(__dirname, `chunk-${index}.json`);
+     //        return writeChunkToFile(filename, JSON.stringify(chunk))
+     //            .then((chunkFilename: string) => multiShot(environments, chunkFilename))
+     //            .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
+     //    }, {concurrency: 6})
+     //        .catch((error: any) => {
+     //            console.log(error)
+     //        })
     })
 
     // `shutter compare master development` <— will compare “prescreenshoted” sites

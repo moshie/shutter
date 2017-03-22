@@ -11,31 +11,34 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
     doc.$(`a[href]`).each(function (i: number, elem: any) {
         let href = doc.$(elem).attr('href')
 
+        let relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)')
+        let forwardSlash = new RegExp('^(\/)')
+
+        if (!relativeRegex.test(href) && paths.indexOf(href) !== -1) {
+            return true;
+        }
+
+        if (forwardSlash.test(href)) {
+            href = href.slice(1)
+            var next = URL.format(domain) + href.slice(1)
+        } else {
+            var next = href
+            href = URL.parse(href).pathname
+            href = typeof href == 'string' && href.length ? href.slice(1) : ''
+        }
+
         if (paths.indexOf(href) !== -1) {
             return true;
         }
 
-        let relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)')
-        let forwardSlash = new RegExp('^(\/)')
+        paths.push(href)
 
-        if (relativeRegex.test(href)) {
-
-            if (forwardSlash.test(href)) {
-                href = href.slice(1)
-                var next = URL.format(domain) + href.slice(1)
-            } else {
-                var next = href
-                href = URL.parse(href).pathname
-                href = typeof href !== 'undefined' && href !== '' ? href.slice(1) : ''
-            }
-
-            if (paths.indexOf(href) !== -1) {
-                return true;
-            }
-
-            paths.push(href)
-            spider.queue(next, (doc: Document) => handleRequest(spider, doc, domain))
+        if (paths.length == 300) {
+            return;
         }
+
+        spider.queue(next, (doc: Document) => handleRequest(spider, doc, domain))
+        
     })
 }
 
@@ -48,6 +51,7 @@ function crawl(environments: environmentsInterface): Promise<any> {
         
         const spider: Spider = new Spider({
             concurrent: 5,
+            error: (error: any, url: string) => reject(error),
             done: () => resolve(paths)
         })
 

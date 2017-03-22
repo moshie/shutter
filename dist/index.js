@@ -6,11 +6,8 @@ var path = require("path");
 var Promise = require("bluebird");
 var fileSystem = require("fs");
 var fs = Promise.promisifyAll(fileSystem);
-var chunk_1 = require("./chunk");
-var multi_shot_1 = require("./multi-shot");
 var folder_comparison_1 = require("./folder-comparison");
 var validation_1 = require("./validation");
-var write_chunk_to_file_1 = require("./write-chunk-to-file");
 var sanitize_environments_1 = require("./sanitize-environments");
 var make_comparison_folder_1 = require("./make-comparison-folder");
 var check_paths_are_directories_1 = require("./check-paths-are-directories");
@@ -24,15 +21,11 @@ program
     validation_1.screenShotsValidation(domains);
     var environments = sanitize_environments_1.default(domains);
     crawl_1.default(environments)
-        .then(function (paths) { return chunk_1.default(paths, 6); })
-        .map(function (chunk, index) {
-        var filename = path.join(__dirname, "chunk-" + index + ".json");
-        return write_chunk_to_file_1.default(filename, JSON.stringify(chunk))
-            .then(function (chunkFilename) { return multi_shot_1.default(environments, chunkFilename); })
-            .then(function (chunkFilename) { return fs.unlinkAsync(chunkFilename); });
-    }, { concurrency: 6 })
-        .catch(function (error) {
-        console.log(error);
+        .then(function (paths) {
+        console.log(paths);
+    })
+        .catch(function (err) {
+        console.log(err);
     });
 });
 program
