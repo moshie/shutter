@@ -28,25 +28,17 @@ program
         screenShotsValidation(domains)
         const environments: environmentsInterface = sanitizeEnvironments(domains)
 
-        crawl(environments)
-            .then((paths: string[]) => {
-                console.log(paths);
+    	crawl(environments)
+    		.then((paths: string[]) => chunk(paths, 6))
+    		.map((chunk: string[], index: number): Promise<string> => {
+            let filename: string = path.join(__dirname, `chunk-${index}.json`);
+            return writeChunkToFile(filename, JSON.stringify(chunk))
+                .then((chunkFilename: string) => multiShot(environments, chunkFilename))
+                .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
+        }, {concurrency: 6})
+            .catch((error: any) => {
+                console.log(error)
             })
-            .catch((err) => {
-                console.log(err);
-            })
-
-    	// crawl(environments)
-    	// 	.then((paths: string[]) => chunk(paths, 6))
-    	// 	.map((chunk: string[], index: number): Promise<string> => {
-     //        let filename: string = path.join(__dirname, `chunk-${index}.json`);
-     //        return writeChunkToFile(filename, JSON.stringify(chunk))
-     //            .then((chunkFilename: string) => multiShot(environments, chunkFilename))
-     //            .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
-     //    }, {concurrency: 6})
-     //        .catch((error: any) => {
-     //            console.log(error)
-     //        })
     })
 
     // `shutter compare master development` <— will compare “prescreenshoted” sites

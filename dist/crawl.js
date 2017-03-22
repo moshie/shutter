@@ -4,15 +4,16 @@ var URL = require("url");
 var Promise = require("bluebird");
 var Spider = require("node-spider");
 var paths = [];
+var visited = [];
 function handleRequest(spider, doc, domain) {
-    doc.$("a[href]").each(function (i, elem) {
-        if (paths.length == 300) {
+    doc.$('a[href]').each(function (i, elem) {
+        if (i == 1000000) {
             return false;
         }
         var href = doc.$(elem).attr('href');
         var relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)');
         var forwardSlash = new RegExp('^(\/)');
-        if (!relativeRegex.test(href) && paths.indexOf(href) !== -1) {
+        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1) {
             return true;
         }
         if (forwardSlash.test(href)) {
@@ -28,7 +29,10 @@ function handleRequest(spider, doc, domain) {
             return true;
         }
         paths.push(href);
-        spider.queue(next, function (doc) { return handleRequest(spider, doc, domain); });
+        if (visited.indexOf(next) == -1) {
+            visited.push(next);
+            spider.queue(next, function (doc) { return handleRequest(spider, doc, domain); });
+        }
     });
 }
 function crawl(environments) {
@@ -38,7 +42,10 @@ function crawl(environments) {
         var spider = new Spider({
             concurrent: 5,
             error: function (error, url) { return reject(error); },
-            done: function () { return resolve(paths); }
+            done: function () { return resolve(paths); },
+            headers: {
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+            },
         });
         spider.queue(URL.format(domain), function (doc) { return handleRequest(spider, doc, domain); });
     });
