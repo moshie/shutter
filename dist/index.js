@@ -6,50 +6,16 @@ var path = require("path");
 var Promise = require("bluebird");
 var fileSystem = require("fs");
 var fs = Promise.promisifyAll(fileSystem);
+var chunk_1 = require("./chunk");
+var multi_shot_1 = require("./multi-shot");
 var folder_comparison_1 = require("./folder-comparison");
 var validation_1 = require("./validation");
+var write_chunk_to_file_1 = require("./write-chunk-to-file");
 var sanitize_environments_1 = require("./sanitize-environments");
 var make_comparison_folder_1 = require("./make-comparison-folder");
 var check_paths_are_directories_1 = require("./check-paths-are-directories");
 var version = require('../package').version;
-var URL = require("url");
-var Spider = require("node-spider");
-function crawl(environments) {
-    for (var environment in environments)
-        break;
-    var paths = [];
-    var domain = URL.parse(environments[environment]);
-    return new Promise(function (resolve, reject) {
-        var spider = new Spider({
-            concurrent: 5,
-            done: function () {
-                resolve(paths);
-            }
-        });
-        spider.queue(URL.format(domain), function handleRequest(doc) {
-            doc.$("a[href]").each(function (i, elem) {
-                var href = doc.$(elem).attr('href');
-                if (paths.includes(href)) {
-                    return true;
-                }
-                var relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)');
-                if (relativeRegex.test(href)) {
-                    if (/^(\/)/.test(href)) {
-                        if (href[0] == '/') {
-                            href = href.slice(1);
-                        }
-                        href = URL.format(domain) + href;
-                    }
-                    if (paths.includes(href)) {
-                        return true;
-                    }
-                    paths.push(href);
-                    spider.queue(href, handleRequest);
-                }
-            });
-        });
-    });
-}
+var crawl_1 = require("./crawl");
 program
     .version(version)
     .command('screenshots [domains...]')
@@ -57,21 +23,16 @@ program
     .action(function (domains) {
     validation_1.screenShotsValidation(domains);
     var environments = sanitize_environments_1.default(domains);
-    crawl(environments)
-        .then(function (paths) {
-        var resolved = paths.map(function (v) {
-            var pathname = URL.parse(v).pathname;
-            if (pathname[0] == '/') {
-                pathname = pathname.slice(1);
-            }
-            return pathname;
-        });
-        var final = resolved.filter(function (item, pos) { return resolved.indexOf(item) == pos; });
-        console.log(final);
-        process.exit();
-    })
+    crawl_1.default(environments)
+        .then(function (paths) { return chunk_1.default(paths, 6); })
+        .map(function (chunk, index) {
+        var filename = path.join(__dirname, "chunk-" + index + ".json");
+        return write_chunk_to_file_1.default(filename, JSON.stringify(chunk))
+            .then(function (chunkFilename) { return multi_shot_1.default(environments, chunkFilename); })
+            .then(function (chunkFilename) { return fs.unlinkAsync(chunkFilename); });
+    }, { concurrency: 6 })
         .catch(function (error) {
-        process.exit();
+        console.log(error);
     });
 });
 program
