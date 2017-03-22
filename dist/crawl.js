@@ -6,6 +6,9 @@ var Spider = require("node-spider");
 var paths = [];
 function handleRequest(spider, doc, domain) {
     doc.$("a[href]").each(function (i, elem) {
+        if (paths.length == 300) {
+            return false;
+        }
         var href = doc.$(elem).attr('href');
         var relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)');
         var forwardSlash = new RegExp('^(\/)');
@@ -25,9 +28,6 @@ function handleRequest(spider, doc, domain) {
             return true;
         }
         paths.push(href);
-        if (paths.length == 300) {
-            return;
-        }
         spider.queue(next, function (doc) { return handleRequest(spider, doc, domain); });
     });
 }

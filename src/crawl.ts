@@ -9,6 +9,11 @@ const paths: string[] = []
 function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
 
     doc.$(`a[href]`).each(function (i: number, elem: any) {
+        
+        if (paths.length == 300) {
+            return false;
+        }
+
         let href = doc.$(elem).attr('href')
 
         let relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)')
@@ -32,10 +37,6 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
         }
 
         paths.push(href)
-
-        if (paths.length == 300) {
-            return;
-        }
 
         spider.queue(next, (doc: Document) => handleRequest(spider, doc, domain))
         
