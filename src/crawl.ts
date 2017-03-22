@@ -14,16 +14,17 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
         
         if (i == 1000000) {
             // Stack overflow prevention
-            return false;
+            return false
         }
 
         let href = doc.$(elem).attr('href')
 
         let relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)')
         let forwardSlash = new RegExp('^(\/)')
+        let extension = new RegExp('(\.\w+)$')
 
-        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1) {
-            return true;
+        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1 || extension.test(href)) {
+            return true
         }
 
         if (forwardSlash.test(href)) {
@@ -36,13 +37,13 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
         }
 
         if (paths.indexOf(href) !== -1) {
-            return true;
+            return true
         }
 
         paths.push(href)
-        
+
         if (visited.indexOf(next) == -1) {
-            visited.push(next);
+            visited.push(next)
             spider.queue(next, (doc: Document) => handleRequest(spider, doc, domain))
         }
         
