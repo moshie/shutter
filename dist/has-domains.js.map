@@ -1,0 +1,1 @@
+{"version":3,"file":"has-domains.js","sourceRoot":"","sources":["../src/has-domains.ts"],"names":[],"mappings":";;AAAA,oBAAoB,OAAsB;IAAtB,wBAAA,EAAA,YAAsB;IACtC,MAAM,CAAC,OAAO,CAAC,MAAM,KAAK,CAAC,CAAA;AAC/B,CAAC;AAED,kBAAe,UAAU,CAAA","sourcesContent":["function hasDomains(domains: string[] = []): boolean {\n    return domains.length !== 0\n}\n\nexport default hasDomains"]}

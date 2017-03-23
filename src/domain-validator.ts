@@ -1,30 +1,9 @@
 import Bag from './bag'
+import hasDomains from './has-domains'
+import domainIsInvalid from './domain-is-invalid'
 import checkShorthandUrl from './check-shorthand-url'
-
-function hasDomains(domains: string[] = []): boolean {
-    return domains.length == 0 ? false : true
-}
-
-function domainIsInvalid(domain: string = ''): boolean {
-    return domain.indexOf('=') === -1
-}
-
-function isEnvironmentProvided(domain: string = ''): boolean {
-    if (domainIsInvalid(domain)) {
-        return false;
-    }
-    let [environment, url] = domain.split('=')
-    return !environment.length || !url.length
-}
-
-function environmentHasSymbols(domain: string = ''): boolean {
-    if (domainIsInvalid(domain)) {
-        return false;
-    }
-    let [environment, url] = domain.split('=')
-    let symbolsRegex = /[!-/ :-@ \[-` {-~]/g;
-    return symbolsRegex.test(environment)
-}
+import isEnvironmentProvided from './is-environment-provided'
+import environmentHasSymbols from './environment-has-symbols'
 
 function domainValidator(domains: string[] = []): Bag {
     const bag: Bag = new Bag('Validation Error');

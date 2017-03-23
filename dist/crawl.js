@@ -3,41 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var URL = require("url");
 var Promise = require("bluebird");
 var Spider = require("node-spider");
+var remove_hash_1 = require("./remove-hash");
+var valid_protocol_1 = require("./valid-protocol");
+var merge_pathname_1 = require("./merge-pathname");
+var is_absolute_url_1 = require("./is-absolute-url");
 var check_shorthand_url_1 = require("./check-shorthand-url");
+var has_invalid_extension_1 = require("./has-invalid-extension");
 var paths = [];
-var visited = [];
-function removeWWW(hostname) {
-    return hostname.indexOf('www.') == 0 ? hostname.slice(4) : hostname;
-}
-function validProtocal(href) {
-    var matches = href.match(/^(?:[a-z]+(?=\:))/);
-    if (matches !== null && !/^(https?)/.test(matches[0])) {
-        return false;
-    }
-    return true;
-}
-function removeHash(href) {
-    var parsedUrl = URL.parse(href);
-    parsedUrl.hash = undefined;
-    return URL.format(parsedUrl);
-}
-function isUrlAbsolute(domain, href) {
-    var absolute = new RegExp('^((https?:\/\/)?(www\.)?(' + removeWWW(domain.host) + domain.pathname + '))');
-    return absolute.test(href);
-}
-function mergePathname(domain, href) {
-    return URL.format(domain) + href.replace(/^(\/)/, '');
-}
 var checked = [];
 function handleRequest(spider, doc, domain) {
     doc.$('a[href]').each(function (i, elem) {
         var href = doc.$(this).attr('href');
-        href = removeHash(href);
-        if (!validProtocal(href) || checked.indexOf(href) !== -1) {
+        href = remove_hash_1.default(href);
+        if (!valid_protocol_1.default(href) || checked.indexOf(href) !== -1 || has_invalid_extension_1.default(href)) {
             return true;
         }
         checked.push(href);
-        if (isUrlAbsolute(domain, href)) {
+        if (is_absolute_url_1.default(domain, href)) {
             var url = check_shorthand_url_1.default(href);
             href = url.pathname;
             href = href.replace(/^(\/)/, '');
@@ -48,7 +30,7 @@ function handleRequest(spider, doc, domain) {
                 return true;
             }
             href = href.replace(/^(\/)/, '');
-            var next = mergePathname(domain, href);
+            var next = merge_pathname_1.default(domain, href);
         }
         if (paths.indexOf(href) !== -1) {
             return true;
@@ -72,5 +54,6 @@ function crawl(environments) {
         spider.queue(URL.format(domain), function (doc) { return handleRequest(spider, doc, domain); });
     });
 }
+handleRequest;
 exports.default = crawl;
 //# sourceMappingURL=crawl.js.map

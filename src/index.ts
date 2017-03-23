@@ -28,14 +28,6 @@ program
         screenShotsValidation(domains)
         const environments: environmentsInterface = sanitizeEnvironments(domains)
 
-        // crawl(environments)
-        //     .then((paths: string[]) => {
-        //         console.log(paths);
-        //     })
-        //     .catch((error: any) => {
-        //         console.log(error);
-        //     })
-
     	crawl(environments)
     		.then((paths: string[]) => chunk(paths, 6))
     		.map((chunk: string[], index: number): Promise<string> => {
