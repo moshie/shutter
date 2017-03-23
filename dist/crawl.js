@@ -13,6 +13,9 @@ var paths = [];
 var checked = [];
 function handleRequest(spider, doc, domain) {
     doc.$('a[href]').each(function (i, elem) {
+        if (i === 1000000) {
+            return false;
+        }
         var href = doc.$(this).attr('href');
         href = remove_hash_1.default(href);
         if (!valid_protocol_1.default(href) || checked.indexOf(href) !== -1 || has_invalid_extension_1.default(href)) {
@@ -44,7 +47,7 @@ function crawl(environments) {
     var domain = URL.parse(url);
     return new Promise(function (resolve, reject) {
         var spider = new Spider({
-            concurrent: 5,
+            concurrent: 10,
             error: function (error, url) { return reject(error); },
             done: function () { return resolve(paths); },
             headers: {
@@ -54,6 +57,5 @@ function crawl(environments) {
         spider.queue(URL.format(domain), function (doc) { return handleRequest(spider, doc, domain); });
     });
 }
-handleRequest;
 exports.default = crawl;
 //# sourceMappingURL=crawl.js.map

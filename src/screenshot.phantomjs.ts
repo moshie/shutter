@@ -55,7 +55,7 @@ const page_width = 1600
 const page_height = 1800
 
 page.viewportSize = { width: page_width, height: page_height }
-page.clipRect = { top: 0, left: 0, width: page_width, height: page_height }
+
 page.settings.resourceTimeout = 10000;
 page.onError = function(msg: string, trace: string|any[]) {}
 phantom.onError = function(msg, trace) {
@@ -85,25 +85,6 @@ function handlePage() {
             console.error('Failed loading: ' + url)
             nextPage()
         }
-
-        // This needs work!
-
-        // Set page height
-        // var height: number = page.evaluate(() => {
-        //     var body = document.body,
-        //         html = document.documentElement
-
-        //     return Math.max(
-        //         body.scrollHeight, 
-        //         body.offsetHeight, 
-        //         html.clientHeight, 
-        //         html.scrollHeight, 
-        //         html.offsetHeight
-        //     )
-        // })
-
-        // page.viewportSize['height'] = height
-        // page.clipRect['height'] = height
 
         var id: string = sanitizePath(paths[count])
         var output: string = `${fs.workingDirectory}/${environment}/${id}_${page_width}x${page_height}.png`

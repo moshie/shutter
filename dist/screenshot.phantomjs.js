@@ -41,7 +41,6 @@ if (!Array.isArray(paths)) {
 var page_width = 1600;
 var page_height = 1800;
 page.viewportSize = { width: page_width, height: page_height };
-page.clipRect = { top: 0, left: 0, width: page_width, height: page_height };
 page.settings.resourceTimeout = 10000;
 page.onError = function (msg, trace) { };
 phantom.onError = function (msg, trace) {

@@ -18,6 +18,10 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
 
     doc.$('a[href]').each(function (i: number, elem: any) {
 
+        if (i === 1000000) {
+            return false;
+        }
+
         let href: string = doc.$(this).attr('href')
 
         href = removeHash(href)
@@ -62,7 +66,7 @@ function crawl(environments: environmentsInterface): Promise<any> {
     return new Promise((resolve, reject) => {
         
         const spider: Spider = new Spider({
-            concurrent: 5,
+            concurrent: 10,
             error: (error: any, url: string) => reject(error),
             done: () => resolve(paths),
             headers: { 
@@ -75,5 +79,4 @@ function crawl(environments: environmentsInterface): Promise<any> {
 
 }
 
-export handleRequest
 export default crawl
