@@ -15,4 +15,4 @@ var Bag = (function () {
     return Bag;
 }());
 exports.default = Bag;
-//# sourceMappingURL=bag.js.map
+//# sourceMappingURL=Bag.js.map

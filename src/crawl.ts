@@ -19,11 +19,20 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
 
         let href = doc.$(elem).attr('href')
 
+        // Need to allow URLS without a / at the start
+        // mailto
+        // tel
+        // fax
+        // http
+        // ftp
+
         let relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)')
         let forwardSlash = new RegExp('^(\/)')
         let extension = new RegExp('(\.\w+)$')
 
-        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1 || extension.test(href)) {
+        // || extension.test(href) Change to white list & flag to check (.html, .htm, .php, .php3, .asp)
+
+        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1) {
             return true
         }
 

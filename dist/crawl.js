@@ -14,7 +14,7 @@ function handleRequest(spider, doc, domain) {
         var relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)');
         var forwardSlash = new RegExp('^(\/)');
         var extension = new RegExp('(\.\w+)$');
-        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1 || extension.test(href)) {
+        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1) {
             return true;
         }
         if (forwardSlash.test(href)) {
