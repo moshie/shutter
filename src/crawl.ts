@@ -4,45 +4,68 @@ import * as Spider from 'node-spider'
 import {environmentsInterface} from './environments-interface'
 import Document from 'node-spider/lib/document'
 
+import checkShorthandUrl from './check-shorthand-url'
+
 const paths: string[] = []
 
 const visited: string[] = []
 
+function removeWWW(hostname: string): string {
+    return hostname.indexOf('www.') == 0 ? hostname.slice(4) : hostname;
+}
+
+function validProtocal(href: string) {
+    let matches: string[]|null = href.match(/^(?:[a-z]+(?=\:))/)
+    if (matches !== null && !/^(https?)/.test(matches[0])) {
+        return false;
+    }
+    return true;
+}
+
+function removeHash(href: string): string {
+    var parsedUrl: URL.Url = URL.parse(href)
+    parsedUrl.hash = undefined
+    return URL.format(parsedUrl)
+}
+
+function isUrlAbsolute(domain: URL.Url, href: string): boolean {
+    var absolute = new RegExp('^((https?:\/\/)?(www\.)?(' + removeWWW(domain.host) + domain.pathname + '))')
+    return absolute.test(href)
+}
+
+function mergePathname(domain: URL.Url, href: string): string {
+    return URL.format(domain) + href.replace(/^(\/)/, '')
+}
+
+const checked: string[] = []
+
 function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
 
     doc.$('a[href]').each(function (i: number, elem: any) {
-        
-        if (i == 1000000) {
-            // Stack overflow prevention
-            return false
-        }
 
-        let href = doc.$(elem).attr('href')
+        let href: string = doc.$(this).attr('href')
 
-        // Need to allow URLS without a / at the start
-        // mailto
-        // tel
-        // fax
-        // http
-        // ftp
+        href = removeHash(href)
 
-        let relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)')
-        let forwardSlash = new RegExp('^(\/)')
-        let extension = new RegExp('(\.\w+)$')
-
-        // || extension.test(href) Change to white list & flag to check (.html, .htm, .php, .php3, .asp)
-
-        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1) {
+        if (!validProtocal(href) || checked.indexOf(href) !== -1) {
             return true
         }
 
-        if (forwardSlash.test(href)) {
-            href = href.slice(1)
-            var next = URL.format(domain) + href.slice(1)
+        checked.push(href)
+
+        if (isUrlAbsolute(domain, href)) {
+            // Absolute
+            var url = checkShorthandUrl(href)
+            href = url.pathname
+            href = href.replace(/^(\/)/, '')
+            var next: string = URL.format(url)
         } else {
-            var next = href
-            href = URL.parse(href).pathname
-            href = typeof href == 'string' && href.length ? href.slice(1) : ''
+            if (/^(https?\:\/\/)/.test(href)) {
+                return true;
+            }
+            // Relative
+            href = href.replace(/^(\/)/, '')
+            var next: string = mergePathname(domain, href)
         }
 
         if (paths.indexOf(href) !== -1) {
@@ -51,10 +74,7 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
 
         paths.push(href)
 
-        if (visited.indexOf(next) == -1) {
-            visited.push(next)
-            spider.queue(next, (doc: Document) => handleRequest(spider, doc, domain))
-        }
+        spider.queue(next, (doc: Document) => handleRequest(spider, doc, domain))
         
     })
 }

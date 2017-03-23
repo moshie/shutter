@@ -3,37 +3,58 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var URL = require("url");
 var Promise = require("bluebird");
 var Spider = require("node-spider");
+var check_shorthand_url_1 = require("./check-shorthand-url");
 var paths = [];
 var visited = [];
+function removeWWW(hostname) {
+    return hostname.indexOf('www.') == 0 ? hostname.slice(4) : hostname;
+}
+function validProtocal(href) {
+    var matches = href.match(/^(?:[a-z]+(?=\:))/);
+    if (matches !== null && !/^(https?)/.test(matches[0])) {
+        return false;
+    }
+    return true;
+}
+function removeHash(href) {
+    var parsedUrl = URL.parse(href);
+    parsedUrl.hash = undefined;
+    return URL.format(parsedUrl);
+}
+function isUrlAbsolute(domain, href) {
+    var absolute = new RegExp('^((https?:\/\/)?(www\.)?(' + removeWWW(domain.host) + domain.pathname + '))');
+    return absolute.test(href);
+}
+function mergePathname(domain, href) {
+    return URL.format(domain) + href.replace(/^(\/)/, '');
+}
+var checked = [];
 function handleRequest(spider, doc, domain) {
     doc.$('a[href]').each(function (i, elem) {
-        if (i == 1000000) {
-            return false;
-        }
-        var href = doc.$(elem).attr('href');
-        var relativeRegex = new RegExp('^(https?\:\/\/(www\.)?' + domain.host + ')|^(\/\w?.*)');
-        var forwardSlash = new RegExp('^(\/)');
-        var extension = new RegExp('(\.\w+)$');
-        if (!relativeRegex.test(href) || paths.indexOf(href) !== -1) {
+        var href = doc.$(this).attr('href');
+        href = removeHash(href);
+        if (!validProtocal(href) || checked.indexOf(href) !== -1) {
             return true;
         }
-        if (forwardSlash.test(href)) {
-            href = href.slice(1);
-            var next = URL.format(domain) + href.slice(1);
+        checked.push(href);
+        if (isUrlAbsolute(domain, href)) {
+            var url = check_shorthand_url_1.default(href);
+            href = url.pathname;
+            href = href.replace(/^(\/)/, '');
+            var next = URL.format(url);
         }
         else {
-            var next = href;
-            href = URL.parse(href).pathname;
-            href = typeof href == 'string' && href.length ? href.slice(1) : '';
+            if (/^(https?\:\/\/)/.test(href)) {
+                return true;
+            }
+            href = href.replace(/^(\/)/, '');
+            var next = mergePathname(domain, href);
         }
         if (paths.indexOf(href) !== -1) {
             return true;
         }
         paths.push(href);
-        if (visited.indexOf(next) == -1) {
-            visited.push(next);
-            spider.queue(next, function (doc) { return handleRequest(spider, doc, domain); });
-        }
+        spider.queue(next, function (doc) { return handleRequest(spider, doc, domain); });
     });
 }
 function crawl(environments) {
