@@ -61,7 +61,7 @@ function handlePage() {
     console.log(url);
     page.open(url, function (status) {
         if (status !== 'success') {
-            console.error('Failed loading: ' + url);
+            console.error(url);
             nextPage();
         }
         var id = sanitizePath(paths[count]);

@@ -1,4 +1,5 @@
 import * as URL from 'url'
+import * as chalk from 'chalk'
 import * as Promise from 'bluebird'
 import * as Spider from 'node-spider'
 import {environmentsInterface} from './environments-interface'
@@ -63,15 +64,23 @@ function crawl(environments: environmentsInterface): Promise<any> {
     const url: string = environments[Object.keys(environments)[0]]
     const domain: URL.Url = URL.parse(url)
 
+    console.log(chalk.blue('Crawling: ') + url)
+
     return new Promise((resolve, reject) => {
         
         const spider: Spider = new Spider({
             concurrent: 10,
-            error: (error: any, url: string) => reject(error),
-            done: () => resolve(paths),
+            error: (error: any, url: string) => {
+                console.log(chalk.red('Error: ') + error.message)
+                reject(error)
+            },
+            done: () => {
+                console.log(chalk.green('Success: ') + `Crawling of ${url} is complete!`)
+                resolve(paths)
+            },
             headers: { 
                 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36' 
-            },
+            }
         })
 
         spider.queue(URL.format(domain), (doc: Document) => handleRequest(spider, doc, domain))

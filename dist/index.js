@@ -38,6 +38,9 @@ program
             .then(function (chunkFilename) { return multi_shot_1.default(environments, chunkFilename); })
             .then(function (chunkFilename) { return fs.unlinkAsync(chunkFilename); });
     }, { concurrency: 6 })
+        .then(function () {
+        console.log(chalk.green('Success: ') + 'Screenshots complete!');
+    })
         .catch(function (error) {
         console.log(error);
     });

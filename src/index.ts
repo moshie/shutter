@@ -39,7 +39,6 @@ program
 
         const environments: environmentsInterface = sanitizeEnvironments(domains)
 
-
     	crawl(environments)
     		.then((paths: string[]) => chunk(paths, 6))
     		.map((chunk: string[], index: number): Promise<string> => {
@@ -48,6 +47,9 @@ program
                 .then((chunkFilename: string) => multiShot(environments, chunkFilename))
                 .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
         }, {concurrency: 6})
+    		.then(() => {
+    			console.log(chalk.green('Success: ') + 'Screenshots complete!')
+    		})
             .catch((error: any) => {
                 console.log(error)
             })

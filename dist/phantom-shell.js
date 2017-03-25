@@ -4,6 +4,7 @@ var child_process_1 = require("child_process");
 var Promise = require("bluebird");
 var is_json_1 = require("./is-json");
 var path = require("path");
+var chalk = require("chalk");
 var phantomCLIPath = [__dirname, '..', 'node_modules', '.bin', 'phantomjs'];
 var phantomCLI = path.resolve.apply(path, phantomCLIPath);
 function screenshot(chunkFilepath, domain, environment) {
@@ -17,7 +18,7 @@ function screenshot(chunkFilepath, domain, environment) {
                 paths = JSON.parse(out);
             }
             else {
-                console.log('Processing: ', out);
+                console.log(chalk.blue('Rendering: '), out);
             }
         });
         phantom.stderr.on('data', function (data) {

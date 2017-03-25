@@ -82,7 +82,7 @@ function handlePage() {
 
     page.open(url, (status: string) => {
         if (status !== 'success') {
-            console.error('Failed loading: ' + url)
+            console.error(url)
             nextPage()
         }
 

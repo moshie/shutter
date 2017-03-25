@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var URL = require("url");
+var chalk = require("chalk");
 var Promise = require("bluebird");
 var Spider = require("node-spider");
 var remove_hash_1 = require("./remove-hash");
@@ -45,14 +46,21 @@ function handleRequest(spider, doc, domain) {
 function crawl(environments) {
     var url = environments[Object.keys(environments)[0]];
     var domain = URL.parse(url);
+    console.log(chalk.blue('Crawling: ') + url);
     return new Promise(function (resolve, reject) {
         var spider = new Spider({
             concurrent: 10,
-            error: function (error, url) { return reject(error); },
-            done: function () { return resolve(paths); },
+            error: function (error, url) {
+                console.log(chalk.red('Error: ') + error.message);
+                reject(error);
+            },
+            done: function () {
+                console.log(chalk.green('Success: ') + ("Crawling of " + url + " is complete!"));
+                resolve(paths);
+            },
             headers: {
                 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-            },
+            }
         });
         spider.queue(URL.format(domain), function (doc) { return handleRequest(spider, doc, domain); });
     });
