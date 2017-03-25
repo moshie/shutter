@@ -63,16 +63,51 @@ program
         .action(function (original, comparison) {
             // Check if urls or paths!!
 
-            const cwd = process.cwd();
-            const comparisonOne = path.join(cwd, original);
-            const comparisonTwo = path.join(cwd, comparison);
+            if (original.indexOf('.') !== -1 && comparison.indexOf('.') !== -1) {
+            	var domains = [`original=${original}`, `comparison=${comparison}`]
+            	try {
+					validator(domains)
+				} catch (error) {
+					console.log(`${chalk.red('Error')}: ${error.message}`);
+				}
 
-            checkPathsAreDirectories(comparisonOne, comparisonTwo)
-                .then(() => makeComparisonFolder(comparisonOne, comparisonTwo))
-                .then(() => folderComparison(comparisonOne, comparisonTwo))
-                .catch((error) => {
-                    console.log(error);
-                });
+				const environments: environmentsInterface = sanitizeEnvironments(domains)
+
+				const cwd = process.cwd();
+	            const comparisonOne = path.join(cwd, 'original');
+	            const comparisonTwo = path.join(cwd, 'comparison');
+
+				crawl(environments)
+		    		.then((paths: string[]) => chunk(paths, 6))
+		    		.map((chunk: string[], index: number): Promise<string> => {
+		            let filename: string = path.join(__dirname, `chunk-${index}.json`);
+		            return writeChunkToFile(filename, JSON.stringify(chunk))
+		                .then((chunkFilename: string) => multiShot(environments, chunkFilename))
+		                .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
+		        }, {concurrency: 6})
+		    		.then(() => {
+		    			console.log(chalk.green('Success: ') + 'Screenshots complete!')
+		    		})
+		    		.then(() => checkPathsAreDirectories(comparisonOne, comparisonTwo))
+		    		.then(() => makeComparisonFolder(comparisonOne, comparisonTwo))
+		    		.then(() => folderComparison(comparisonOne, comparisonTwo))
+		            .catch((error: any) => {
+		                console.log(error)
+		            })
+
+            } else {
+
+	            const cwd = process.cwd();
+	            const comparisonOne = path.join(cwd, original);
+	            const comparisonTwo = path.join(cwd, comparison);
+
+	            checkPathsAreDirectories(comparisonOne, comparisonTwo)
+	                .then(() => makeComparisonFolder(comparisonOne, comparisonTwo))
+	                .then(() => folderComparison(comparisonOne, comparisonTwo))
+	                .catch((error) => {
+	                    console.log(error);
+	                });
+            }
         })
 
 

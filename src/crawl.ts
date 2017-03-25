@@ -38,7 +38,7 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
             var url: string = checkShorthandUrl(href)
             href = URL.parse(url).pathname
             href = href.replace(/^(\/)/, '')
-            var next: string = URL.format(url)
+            var next: string = url
         } else {
             if (/^(https?\:\/\/)/.test(href)) {
                 return true;
@@ -69,7 +69,7 @@ function crawl(environments: environmentsInterface): Promise<any> {
     return new Promise((resolve, reject) => {
         
         const spider: Spider = new Spider({
-            concurrent: 10,
+            concurrent: 20,
             error: (error: any, url: string) => {
                 console.log(chalk.red('Error: ') + error.message)
                 reject(error)

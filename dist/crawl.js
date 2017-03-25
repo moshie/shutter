@@ -27,7 +27,7 @@ function handleRequest(spider, doc, domain) {
             var url = check_shorthand_url_1.default(href);
             href = URL.parse(url).pathname;
             href = href.replace(/^(\/)/, '');
-            var next = URL.format(url);
+            var next = url;
         }
         else {
             if (/^(https?\:\/\/)/.test(href)) {
@@ -49,7 +49,7 @@ function crawl(environments) {
     console.log(chalk.blue('Crawling: ') + url);
     return new Promise(function (resolve, reject) {
         var spider = new Spider({
-            concurrent: 10,
+            concurrent: 20,
             error: function (error, url) {
                 console.log(chalk.red('Error: ') + error.message);
                 reject(error);
