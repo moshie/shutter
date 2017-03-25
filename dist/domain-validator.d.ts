@@ -1,3 +1,2 @@
-import Bag from './bag';
-declare function domainValidator(domains?: string[]): Bag;
+declare function domainValidator(domains?: string[]): void;
 export default domainValidator;

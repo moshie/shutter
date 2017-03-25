@@ -6,7 +6,7 @@ function checkShorthandUrl(domain) {
     if (url.protocol === null) {
         url = URL.parse("http://" + domain);
     }
-    return url;
+    return URL.format(url);
 }
 exports.default = checkShorthandUrl;
 //# sourceMappingURL=check-shorthand-url.js.map

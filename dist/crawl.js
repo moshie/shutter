@@ -24,7 +24,7 @@ function handleRequest(spider, doc, domain) {
         checked.push(href);
         if (is_absolute_url_1.default(domain, href)) {
             var url = check_shorthand_url_1.default(href);
-            href = url.pathname;
+            href = URL.parse(url).pathname;
             href = href.replace(/^(\/)/, '');
             var next = URL.format(url);
         }

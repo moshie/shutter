@@ -34,8 +34,8 @@ function handleRequest(spider: Spider, doc: Document, domain: URL.Url) {
 
         if (isAbsoluteUrl(domain, href)) {
             // Absolute
-            var url: URL.Url = checkShorthandUrl(href)
-            href = url.pathname
+            var url: string = checkShorthandUrl(href)
+            href = URL.parse(url).pathname
             href = href.replace(/^(\/)/, '')
             var next: string = URL.format(url)
         } else {

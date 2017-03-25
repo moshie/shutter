@@ -1,7 +1,7 @@
-import { errorBag } from './error-bag-interface';
+import { log } from './log-interface';
 declare class Bag {
     defaultPrefix: string;
-    contents: errorBag[];
+    contents: log[];
     constructor(defaultPrefix?: string);
     add(message: string, prefix?: string): void;
 }

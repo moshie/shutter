@@ -1,32 +1,44 @@
 #!/usr/bin/env node
 
-import * as program from 'commander'
-import {environmentsInterface} from './environments-interface'
+
+import * as chalk from 'chalk'
 import * as path from 'path'
 import * as Promise from 'bluebird'
+import * as program from 'commander'
 import * as fileSystem from 'fs'
 const fs: any = Promise.promisifyAll(fileSystem)
 
 import chunk from './chunk'
+import crawl from './crawl'
+import validator from './validator'
 import multiShot from './multi-shot'
 import folderComparison from './folder-comparison'
-import {screenShotsValidation} from './validation'
 import writeChunkToFile from './write-chunk-to-file'
 import sanitizeEnvironments from './sanitize-environments'
 import makeComparisonFolder from './make-comparison-folder'
+import {environmentsInterface} from './environments-interface'
 import checkPathsAreDirectories from './check-paths-are-directories'
+
 const version = require('../package').version;
-import crawl from './crawl'
+
 
 // `shutter screenshots master=https://google.com development=https://dev.google.com test=https://test.google.com —config=~/config.yaml`
 
 program
     .version(version)
     .command('screenshots [domains...]')
+    .description('take screenshots of specified domains')
     .arguments('-c, --config')
     .action(function (domains: string[]) {
-        screenShotsValidation(domains)
+
+    	try {
+			validator(domains)
+		} catch (error) {
+			console.log(`${chalk.red('Error')}: ${error.message}`);
+		}
+
         const environments: environmentsInterface = sanitizeEnvironments(domains)
+
 
     	crawl(environments)
     		.then((paths: string[]) => chunk(paths, 6))

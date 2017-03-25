@@ -1,1 +1,1 @@
-export declare function screenShotsValidation(domains: string[]): void;
+export declare function domainValidation(domains: string[]): void;
