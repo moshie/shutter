@@ -1,54 +1,48 @@
 #!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var chalk = require("chalk");
 var path = require("path");
-var Promise = require("bluebird");
+var chalk = require("chalk");
 var program = require("commander");
-var fileSystem = require("fs");
-var fs = Promise.promisifyAll(fileSystem);
-var chunk_1 = require("./chunk");
 var crawl_1 = require("./crawl");
 var validator_1 = require("./validator");
-var multi_shot_1 = require("./multi-shot");
-var folder_comparison_1 = require("./folder-comparison");
-var write_chunk_to_file_1 = require("./write-chunk-to-file");
+var screenshot_chunk_1 = require("./screenshot-chunk");
+var compare_directories_1 = require("./compare-directories");
 var sanitize_environments_1 = require("./sanitize-environments");
-var make_comparison_folder_1 = require("./make-comparison-folder");
-var check_paths_are_directories_1 = require("./check-paths-are-directories");
 var version = require('../package').version;
 program
     .version(version)
-    .command('screenshots [domains...]')
-    .description('take screenshots of specified domains')
+    .command('screenshots [environments...]')
+    .description('Render screenshots of web pages')
     .arguments('-c, --config')
-    .action(function (domains) {
+    .action(function (environments) {
     try {
-        validator_1.default(domains);
+        validator_1.default(environments);
     }
     catch (error) {
-        console.log(chalk.red('Error') + ": " + error.message);
+        console.log("\n" + chalk.red('Error:') + " " + error.message + "\n");
+        process.exit(1);
     }
-    var environments = sanitize_environments_1.default(domains);
-    crawl_1.default(environments)
-        .then(function (paths) { return chunk_1.default(paths, 6); })
+    var sanitizedEnvironments = sanitize_environments_1.default(environments);
+    crawl_1.default(sanitizedEnvironments)
         .map(function (chunk, index) {
-        var filename = path.join(__dirname, "chunk-" + index + ".json");
-        return write_chunk_to_file_1.default(filename, JSON.stringify(chunk))
-            .then(function (chunkFilename) { return multi_shot_1.default(environments, chunkFilename); })
-            .then(function (chunkFilename) { return fs.unlinkAsync(chunkFilename); });
+        return screenshot_chunk_1.default(sanitizedEnvironments, chunk, index);
     }, { concurrency: 6 })
-        .then(function () {
-        console.log(chalk.green('Success: ') + 'Screenshots complete!');
-    })
         .catch(function (error) {
-        console.log(error);
+        console.log(chalk.red('Error:') + " " + error.message);
     });
 });
+function isUrl(path) {
+}
 program
     .command('compare <original> <comparison>')
     .action(function (original, comparison) {
-    if (original.indexOf('.') !== -1 && comparison.indexOf('.') !== -1) {
+    var cwd = process.cwd();
+    var comparisonOne = path.join(cwd, original);
+    var comparisonTwo = path.join(cwd, comparison);
+    if (isUrl(original) && isUrl(comparison)) {
+        comparisonOne = path.join(cwd, 'original');
+        comparisonTwo = path.join(cwd, 'comparison');
         var domains = ["original=" + original, "comparison=" + comparison];
         try {
             validator_1.default(domains);
@@ -57,38 +51,21 @@ program
             console.log(chalk.red('Error') + ": " + error.message);
         }
         var environments_1 = sanitize_environments_1.default(domains);
-        var cwd = process.cwd();
-        var comparisonOne_1 = path.join(cwd, 'original');
-        var comparisonTwo_1 = path.join(cwd, 'comparison');
         crawl_1.default(environments_1)
-            .then(function (paths) { return chunk_1.default(paths, 6); })
             .map(function (chunk, index) {
-            var filename = path.join(__dirname, "chunk-" + index + ".json");
-            return write_chunk_to_file_1.default(filename, JSON.stringify(chunk))
-                .then(function (chunkFilename) { return multi_shot_1.default(environments_1, chunkFilename); })
-                .then(function (chunkFilename) { return fs.unlinkAsync(chunkFilename); });
+            return screenshot_chunk_1.default(environments_1, chunk, index);
         }, { concurrency: 6 })
-            .then(function () {
-            console.log(chalk.green('Success: ') + 'Screenshots complete!');
-        })
-            .then(function () { return check_paths_are_directories_1.default(comparisonOne_1, comparisonTwo_1); })
-            .then(function () { return make_comparison_folder_1.default(comparisonOne_1, comparisonTwo_1); })
-            .then(function () { return folder_comparison_1.default(comparisonOne_1, comparisonTwo_1); })
+            .then(function () { return compare_directories_1.default(comparisonOne, comparisonTwo); })
             .catch(function (error) {
-            console.log(error);
+            console.log(chalk.red('Error:') + " " + error);
         });
+        return;
     }
-    else {
-        var cwd = process.cwd();
-        var comparisonOne_2 = path.join(cwd, original);
-        var comparisonTwo_2 = path.join(cwd, comparison);
-        check_paths_are_directories_1.default(comparisonOne_2, comparisonTwo_2)
-            .then(function () { return make_comparison_folder_1.default(comparisonOne_2, comparisonTwo_2); })
-            .then(function () { return folder_comparison_1.default(comparisonOne_2, comparisonTwo_2); })
-            .catch(function (error) {
-            console.log(error);
-        });
-    }
+    compare_directories_1.default(comparisonOne, comparisonTwo)
+        .catch(function (error) {
+        console.log(chalk.red('Error:') + " " + error);
+        process.exit(1);
+    });
 });
 program.parse(process.argv);
 //# sourceMappingURL=index.js.map

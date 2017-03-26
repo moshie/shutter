@@ -1,114 +1,102 @@
 #!/usr/bin/env node
 
-
-import * as chalk from 'chalk'
+// Vendor
 import * as path from 'path'
+import * as chalk from 'chalk'
 import * as Promise from 'bluebird'
 import * as program from 'commander'
-import * as fileSystem from 'fs'
-const fs: any = Promise.promisifyAll(fileSystem)
 
-import chunk from './chunk'
+// Internal
 import crawl from './crawl'
 import validator from './validator'
-import multiShot from './multi-shot'
-import folderComparison from './folder-comparison'
-import writeChunkToFile from './write-chunk-to-file'
+import screenshotChunk from './screenshot-chunk'
+import compareDirectories from './compare-directories'
 import sanitizeEnvironments from './sanitize-environments'
-import makeComparisonFolder from './make-comparison-folder'
 import {environmentsInterface} from './environments-interface'
-import checkPathsAreDirectories from './check-paths-are-directories'
 
-const version = require('../package').version;
-
-
-// `shutter screenshots master=https://google.com development=https://dev.google.com test=https://test.google.com —config=~/config.yaml`
+// Misc
+const version = require('../package').version
 
 program
     .version(version)
-    .command('screenshots [domains...]')
-    .description('take screenshots of specified domains')
+    .command('screenshots [environments...]')
+    .description('Render screenshots of web pages')
     .arguments('-c, --config')
-    .action(function (domains: string[]) {
+    .action(function (environments: string[]) {
 
+    	// Validation
     	try {
-			validator(domains)
+			validator(environments)
 		} catch (error) {
-			console.log(`${chalk.red('Error')}: ${error.message}`);
+			console.log(`\n${chalk.red('Error:')} ${error.message}\n`)
+			process.exit(1)
 		}
 
-        const environments: environmentsInterface = sanitizeEnvironments(domains)
+		// Sanitize
+        const sanitizedEnvironments: environmentsInterface = sanitizeEnvironments(environments)
 
-    	crawl(environments)
-    		.then((paths: string[]) => chunk(paths, 6))
+        // Crawl -> Screenshot
+    	crawl(sanitizedEnvironments)
     		.map((chunk: string[], index: number): Promise<string> => {
-            let filename: string = path.join(__dirname, `chunk-${index}.json`);
-            return writeChunkToFile(filename, JSON.stringify(chunk))
-                .then((chunkFilename: string) => multiShot(environments, chunkFilename))
-                .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
-        }, {concurrency: 6})
-    		.then(() => {
-    			console.log(chalk.green('Success: ') + 'Screenshots complete!')
-    		})
-            .catch((error: any) => {
-                console.log(error)
-            })
+	            return screenshotChunk(sanitizedEnvironments, chunk, index)
+	        }, {concurrency: 6})
+	            .catch((error: Error) => {
+	                console.log(`${chalk.red('Error:')} ${error.message}`)
+	            })
     })
 
     // `shutter compare master development` <— will compare “prescreenshoted” sites
     // `shutter compare https://google.com https://dev.google.com` <— will crawl site, take screenshots then compare them
 
+
+
+    function isUrl(path: string): boolean {
+    	// TODO: make this work!
+    }
+
+
     program
         .command('compare <original> <comparison>')
         .action(function (original, comparison) {
-            // Check if urls or paths!!
 
-            if (original.indexOf('.') !== -1 && comparison.indexOf('.') !== -1) {
-            	var domains = [`original=${original}`, `comparison=${comparison}`]
-            	try {
+        	let cwd = process.cwd()
+        	let comparisonOne = path.join(cwd, original)
+            let comparisonTwo = path.join(cwd, comparison)
+
+        	if (isUrl(original) && isUrl(comparison)) {
+
+        		comparisonOne = path.join(cwd, 'original')
+            	comparisonTwo = path.join(cwd, 'comparison')
+
+        		var domains = [`original=${original}`, `comparison=${comparison}`]
+
+        		try {
 					validator(domains)
 				} catch (error) {
-					console.log(`${chalk.red('Error')}: ${error.message}`);
+					console.log(`${chalk.red('Error')}: ${error.message}`)
 				}
 
 				const environments: environmentsInterface = sanitizeEnvironments(domains)
-
-				const cwd = process.cwd();
-	            const comparisonOne = path.join(cwd, 'original');
-	            const comparisonTwo = path.join(cwd, 'comparison');
-
+        		
 				crawl(environments)
-		    		.then((paths: string[]) => chunk(paths, 6))
-		    		.map((chunk: string[], index: number): Promise<string> => {
-		            let filename: string = path.join(__dirname, `chunk-${index}.json`);
-		            return writeChunkToFile(filename, JSON.stringify(chunk))
-		                .then((chunkFilename: string) => multiShot(environments, chunkFilename))
-		                .then((chunkFilename: string) => fs.unlinkAsync(chunkFilename))
-		        }, {concurrency: 6})
-		    		.then(() => {
-		    			console.log(chalk.green('Success: ') + 'Screenshots complete!')
-		    		})
-		    		.then(() => checkPathsAreDirectories(comparisonOne, comparisonTwo))
-		    		.then(() => makeComparisonFolder(comparisonOne, comparisonTwo))
-		    		.then(() => folderComparison(comparisonOne, comparisonTwo))
-		            .catch((error: any) => {
-		                console.log(error)
+		    		.map((chunk: string[], index: number) => {
+		    			return screenshotChunk(environments, chunk, index)
+		    		}, {concurrency: 6})
+		    		.then(() => compareDirectories(comparisonOne, comparisonTwo))
+		    		.catch((error: any) => {
+		                console.log(`${chalk.red('Error:')} ${error}`)
 		            })
 
-            } else {
+	    		return
+        	}
 
-	            const cwd = process.cwd();
-	            const comparisonOne = path.join(cwd, original);
-	            const comparisonTwo = path.join(cwd, comparison);
+      		compareDirectories(comparisonOne, comparisonTwo)
+                .catch((error: string) => {
+                    console.log(`${chalk.red('Error:')} ${error}`)
+                    process.exit(1)
+                }) 		
 
-	            checkPathsAreDirectories(comparisonOne, comparisonTwo)
-	                .then(() => makeComparisonFolder(comparisonOne, comparisonTwo))
-	                .then(() => folderComparison(comparisonOne, comparisonTwo))
-	                .catch((error) => {
-	                    console.log(error);
-	                });
-            }
         })
 
 
-program.parse(process.argv);
+program.parse(process.argv)

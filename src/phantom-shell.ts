@@ -1,8 +1,11 @@
+// Vendor
 import {spawn as shell} from 'child_process'
 import * as Promise from 'bluebird'
-import isJson from './is-json'
-import * as path from 'path'
 import * as chalk from 'chalk'
+import * as path from 'path'
+
+// Internal
+import isJson from './is-json'
 
 const phantomCLIPath: string[] = [__dirname, '..', 'node_modules', '.bin', 'phantomjs']
 const phantomCLI: string = path.resolve(...phantomCLIPath)
@@ -22,7 +25,7 @@ function screenshot(chunkFilepath: string, domain: string, environment: string):
             if (isJson(out)) {
                 paths = JSON.parse(out)
             } else {
-            	console.log(chalk.blue('Rendering: '), out)
+                console.log(`${chalk.cyan('Screenshot:')} ${chalk.gray(out)}`)
             }
         })
 
