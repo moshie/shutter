@@ -8,3 +8,5 @@
 /comparisons/*.png
 chunk-*.json
 npm-debug.log
+/dist
+/dist/**/*.js
