@@ -3,22 +3,20 @@
         "target": "es5",
         "outDir": "dist",
         "module": "commonjs",
-        "declaration": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "removeComments": true,
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "inlineSources": true
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "noEmitOnError": false,
+        "pretty": true
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist"
     ],
     "files": [
-        //"src/chunk.ts",
         "src/index.ts",
+        "src/compare.ts",
+        "src/crawl.ts",
         "src/is-json.ts",
-        "src/sanitize-path.ts",
-        "src/screenshot.phantomjs.ts"
+        "src/sanitize-path.ts"
     ]
 }

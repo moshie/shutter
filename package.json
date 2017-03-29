@@ -6,9 +6,9 @@
   "scripts": {
     "test": "mocha --opts mocha.opts && rm -rf test",
     "test:auto": "mocha --opts mocha.opts --watch",
-    "tsc": "tsc",
+    "build": "tsc",
     "tscw": "tsc -w",
-    "postinstall": "npm run tsc",
+    "prepublish": "npm run build",
     "start": "node dist/index.js"
   },
   "keywords": [
@@ -32,10 +32,9 @@
   },
   "dependencies": {
     "@types/bluebird": "^3.0.37",
-    "@types/commander": "^2.3.31",
-    "@types/node": "^7.0.5",
     "@types/chalk": "^0.4.31",
-    "@types/phantomjs": "^1.9.29",
+    "@types/commander": "^2.3.31",
+    "@types/node": "^7.0.12",
     "blink-diff": "^1.0.13",
     "bluebird": "^3.4.7",
     "chalk": "^1.1.3",
