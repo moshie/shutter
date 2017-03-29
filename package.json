@@ -1,12 +1,14 @@
 {
   "name": "site-shutter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Shutter captures screenshots of internal website pages and compares them for differences",
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha --opts mocha.opts && rm -rf test",
     "test:auto": "mocha --opts mocha.opts --watch",
-    "watch": "tsc -w",
+    "tsc": "tsc",
+    "tscw": "tsc -w",
+    "preversion": "npm run tsc",
     "start": "node dist/index.js"
   },
   "keywords": [

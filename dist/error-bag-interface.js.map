@@ -1,1 +1,0 @@
-{"version":3,"file":"error-bag-interface.js","sourceRoot":"","sources":["../src/error-bag-interface.ts"],"names":[],"mappings":"","sourcesContent":["export interface log {\n    prefix?: string\n    message: string\n}"]}
