@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var child_process_1 = require("child_process");
 var Promise = require("bluebird");
-var chalk = require("chalk");
 var path = require("path");
 var is_json_1 = require("./is-json");
 var phantomCLIPath = [__dirname, '..', 'node_modules', '.bin', 'phantomjs'];
@@ -18,7 +17,6 @@ function screenshot(chunkFilepath, domain, environment) {
                 paths = JSON.parse(out);
             }
             else {
-                console.log(chalk.cyan('Screenshot:') + " " + chalk.gray(out));
             }
         });
         phantom.stderr.on('data', function (data) {

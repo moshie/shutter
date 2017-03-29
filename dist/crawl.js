@@ -44,7 +44,7 @@ function handleRequest(spider, doc, domain) {
 function crawl(environments) {
     var url = environments[Object.keys(environments)[0]];
     var domain = URL.parse(url);
-    console.log(chalk.cyan('Info:') + " Crawling " + chalk.bgBlue(url));
+    console.log(chalk.magenta('Info:') + " Collecting internal pages from " + chalk.bgBlack(url));
     return new Promise(function (resolve, reject) {
         var spider = new Spider({
             concurrent: 20,
@@ -53,7 +53,7 @@ function crawl(environments) {
                 reject(error);
             },
             done: function () {
-                console.log(chalk.green('Success:') + " Crawling of " + url + " is complete!");
+                console.log(chalk.green('Success:') + " Internal pages collected");
                 resolve(chunk_1.default(paths, 6));
             },
             headers: {

@@ -64,7 +64,7 @@ function crawl(environments: environmentsInterface): Promise<any> {
     const url: string = environments[Object.keys(environments)[0]]
     const domain: URL.Url = URL.parse(url)
 
-    console.log(`${chalk.cyan('Info:')} Crawling ${chalk.bgBlue(url)}`)
+    console.log(`${chalk.magenta('Info:')} Collecting internal pages from ${chalk.bgBlack(url)}`)
 
     return new Promise((resolve, reject) => {
         
@@ -75,7 +75,7 @@ function crawl(environments: environmentsInterface): Promise<any> {
                 reject(error)
             },
             done: () => {
-                console.log(`${chalk.green('Success:')} Crawling of ${url} is complete!`)
+                console.log(`${chalk.green('Success:')} Internal pages collected`)
                 resolve(chunk(paths, 6))
             },
             headers: { 

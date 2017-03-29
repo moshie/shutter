@@ -1,4 +1,5 @@
 import * as path from 'path'
+import * as chalk from 'chalk'
 import * as Promise from 'bluebird'
 import * as fileSystem from 'fs'
 const fs: any = Promise.promisifyAll(fileSystem)
@@ -6,6 +7,7 @@ const fs: any = Promise.promisifyAll(fileSystem)
 import compare from './compare'
 
 function folderComparison(original: string, comparison: string) {
+    console.log(`${chalk.magenta(`Info:`)} Comparing ${chalk.gray(path.basename(original))} with ${chalk.gray(path.basename(comparison))}`)
     return Promise.map(fs.readdirAsync(original), (filename: string) => {
         let originalResolved: string = path.resolve(original, filename)
         let comparisonResolved: string = path.resolve(comparison, filename)

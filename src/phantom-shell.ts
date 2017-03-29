@@ -25,7 +25,8 @@ function screenshot(chunkFilepath: string, domain: string, environment: string):
             if (isJson(out)) {
                 paths = JSON.parse(out)
             } else {
-                console.log(`${chalk.cyan('Screenshot:')} ${chalk.gray(out)}`)
+                // Verbose mode
+                //console.log(`${chalk.cyan('Screenshot:')} ${chalk.gray(out)}`)
             }
         })
 

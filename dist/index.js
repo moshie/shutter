@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var fs = require("fs");
 var path = require("path");
 var chalk = require("chalk");
 var program = require("commander");
@@ -25,46 +26,64 @@ program
     }
     var sanitizedEnvironments = sanitize_environments_1.default(environments);
     crawl_1.default(sanitizedEnvironments)
+        .then(function (chunks) {
+        console.log(chalk.magenta("In Progress:") + " Capturing paths \uD83C\uDFDE");
+        return chunks;
+    })
         .map(function (chunk, index) {
         return screenshot_chunk_1.default(sanitizedEnvironments, chunk, index);
     }, { concurrency: 6 })
+        .then(function () {
+        console.log(chalk.green("Success:") + "  Paths captured successfully");
+    })
         .catch(function (error) {
         console.log(chalk.red('Error:') + " " + error.message);
     });
 });
-function isUrl(path) {
-}
 program
     .command('compare <original> <comparison>')
     .action(function (original, comparison) {
     var cwd = process.cwd();
     var comparisonOne = path.join(cwd, original);
     var comparisonTwo = path.join(cwd, comparison);
-    if (isUrl(original) && isUrl(comparison)) {
-        comparisonOne = path.join(cwd, 'original');
-        comparisonTwo = path.join(cwd, 'comparison');
-        var domains = ["original=" + original, "comparison=" + comparison];
-        try {
-            validator_1.default(domains);
-        }
-        catch (error) {
-            console.log(chalk.red('Error') + ": " + error.message);
-        }
-        var environments_1 = sanitize_environments_1.default(domains);
-        crawl_1.default(environments_1)
-            .map(function (chunk, index) {
-            return screenshot_chunk_1.default(environments_1, chunk, index);
-        }, { concurrency: 6 })
-            .then(function () { return compare_directories_1.default(comparisonOne, comparisonTwo); })
+    if (fs.existsSync(comparisonOne) && fs.existsSync(comparisonTwo)) {
+        compare_directories_1.default(comparisonOne, comparisonTwo)
+            .then(function () {
+            console.log(chalk.green("Success:") + " Sites compared successfully");
+        })
             .catch(function (error) {
             console.log(chalk.red('Error:') + " " + error);
+            process.exit(1);
         });
         return;
     }
-    compare_directories_1.default(comparisonOne, comparisonTwo)
+    var domains = ["original=" + original, "comparison=" + comparison];
+    try {
+        validator_1.default(domains);
+    }
+    catch (error) {
+        console.log(chalk.red('Error') + ": " + error.message);
+    }
+    var environments = sanitize_environments_1.default(domains);
+    comparisonOne = path.join(cwd, 'original');
+    comparisonTwo = path.join(cwd, 'comparison');
+    crawl_1.default(environments)
+        .then(function (chunks) {
+        console.log(chalk.magenta("In Progress:") + " Capturing paths \uD83C\uDFDE");
+        return chunks;
+    })
+        .map(function (chunk, index) {
+        return screenshot_chunk_1.default(environments, chunk, index);
+    }, { concurrency: 6 })
+        .then(function () {
+        console.log(chalk.green("Success:") + "  Paths captured successfully");
+    })
+        .then(function () { return compare_directories_1.default(comparisonOne, comparisonTwo); })
+        .then(function () {
+        console.log(chalk.green("Success:") + " Sites compared successfully");
+    })
         .catch(function (error) {
         console.log(chalk.red('Error:') + " " + error);
-        process.exit(1);
     });
 });
 program.parse(process.argv);

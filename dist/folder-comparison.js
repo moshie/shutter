@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
+var chalk = require("chalk");
 var Promise = require("bluebird");
 var fileSystem = require("fs");
 var fs = Promise.promisifyAll(fileSystem);
 var compare_1 = require("./compare");
 function folderComparison(original, comparison) {
+    console.log(chalk.magenta("Info:") + " Comparing " + chalk.gray(path.basename(original)) + " with " + chalk.gray(path.basename(comparison)));
     return Promise.map(fs.readdirAsync(original), function (filename) {
         var originalResolved = path.resolve(original, filename);
         var comparisonResolved = path.resolve(comparison, filename);
