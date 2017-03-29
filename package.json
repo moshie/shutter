@@ -1,6 +1,6 @@
 {
   "name": "site-shutter",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Shutter captures screenshots of internal website pages and compares them for differences",
   "main": "dist/index.js",
   "scripts": {
