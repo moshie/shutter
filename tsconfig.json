@@ -16,6 +16,7 @@
         "src/index.ts",
         "src/compare.ts",
         "src/crawl.ts",
+        "src/screenshot.phantomjs.ts",
         "src/is-json.ts",
         "src/sanitize-path.ts"
     ]

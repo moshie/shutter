@@ -1,0 +1,15 @@
+"use strict";
+var chalk = require("chalk");
+var has_read_access_1 = require("./has-read-access");
+var phantom_shell_1 = require("./phantom-shell");
+function screenshot(chunkFilepath, domain, environment) {
+    return has_read_access_1.default(chunkFilepath)
+        .then(function (filepath) {
+        return phantom_shell_1.default(filepath, domain, environment);
+    })
+        .catch(function (error) {
+        console.log(chalk.red('Error: ') + error);
+    });
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = screenshot;
