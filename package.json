@@ -1,7 +1,7 @@
 {
   "name": "site-shutter",
   "version": "1.0.1",
-  "description": "",
+  "description": "Shutter captures screenshots of internal website pages and compares them for differences",
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha --opts mocha.opts && rm -rf test",
