@@ -1,6 +1,13 @@
 language: node_js
-
 node_js:
-  - "node"
-  - "7"
-  - "6"
+- node
+- '7'
+- '6'
+deploy:
+  provider: npm
+  email: hello@wp-unite.io
+  api_key:
+    secure: U8YxsfdNeJTJczMvRFn9KLxUzU9gAC+NT2CQonaFE/EI4tfKXlf1rZGqH3FhoGly33Hjp6eq205JvwxQ1IT7fsErqfwwNeV9k4c3IIqok+r8kTBbChrBkMfUoPbJX7SSpeFL/RwoPqXGNU5RBKZvR7TFyEqXbDolwPxVoxVwxIRZiE3+YusghCttLx7Aj+AP3yXTkna0oncKX2xh/fj9maHH85/wzQ+9PlIxZAp8V8KCVdT3pLPNewCitrC3+GPi1Jl03/rOnLj0+FHRhj6ShCvc3NtesYcp1SW7LSGKmR286EaHVdPWDbQEgZQELIjXo5HKP+zIZtCq4qJs200bXZL7tEOIA1+JQ5KQkdDsYCy2VEBQBNCUid3889gCS/Clm5FP1uJa6ENnoAVuc5U2/xePjVWQN8ggzRtiojDNjuaCFR5yZ1lwrhEDy83/60oHQAbJmYuQLoNk+A7fsw7EANNCG6FQ94nxqsUTweZmhmTpX57wSk9uyrrhXrqEXF60Vemng1J1SiI0hcJslhfj2uxr0+4e4mJ68us6orSd2Z0tw3tuFqV/AB+mTbkGDY0WCSv4I9UawpbezQiLv8jRYgbJlUS9eweGcuL4tPJQoOFjiTPUmlExUJluS53oQns8cf7BwP1GbjkG/C9evjZO39cEoll5yCSuJz+638ZNqpw=
+  on:
+    branch: master
+    repo: moshie/shutter
