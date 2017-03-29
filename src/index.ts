@@ -105,14 +105,18 @@ program
                     return screenshotChunk(environments, chunk, index)
                 }, {concurrency: 6})
                 .then(() => {
-                    console.log(`${chalk.green(`Success:`)}  Paths captured successfully`)
+                    console.log(`${chalk.green(`Success:`)} Paths captured successfully`)
                 })
                 .then(() => compareDirectories(comparisonOne, comparisonTwo))
                 .then(() => {
-                    console.log(`${chalk.green(`Success:`)} Sites compared successfully`)
+                    console.log(`${chalk.green(`Success:`)} Sites compared successfully 🏞  <=> 🏞`)
                 })
                 .catch((error: any) => {
-                    console.log(`${chalk.red('Error:')} ${error}`)
+                    if (typeof error === 'object') {
+                        console.log(`${chalk.red('Error:')} ☠️ ${error.message}`)
+                    }
+
+                    console.log(`${chalk.red('Error:')} ☠️ ${error}`)
                 })
 
         })

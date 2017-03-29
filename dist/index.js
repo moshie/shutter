@@ -76,14 +76,17 @@ program
         return screenshot_chunk_1.default(environments, chunk, index);
     }, { concurrency: 6 })
         .then(function () {
-        console.log(chalk.green("Success:") + "  Paths captured successfully");
+        console.log(chalk.green("Success:") + " Paths captured successfully");
     })
         .then(function () { return compare_directories_1.default(comparisonOne, comparisonTwo); })
         .then(function () {
-        console.log(chalk.green("Success:") + " Sites compared successfully");
+        console.log(chalk.green("Success:") + " Sites compared successfully \uD83C\uDFDE  <=> \uD83C\uDFDE");
     })
         .catch(function (error) {
-        console.log(chalk.red('Error:') + " " + error);
+        if (typeof error === 'object') {
+            console.log(chalk.red('Error:') + " \u2620\uFE0F " + error.message);
+        }
+        console.log(chalk.red('Error:') + " \u2620\uFE0F " + error);
     });
 });
 program.parse(process.argv);
