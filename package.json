@@ -21,7 +21,7 @@
     "url": "https://github.com/moshie/shutter"
   },
   "bin": {
-    "shutter": "./dist/index.js"
+    "shutter": "./dist/bin/index.js"
   },
   "preferGlobal": true,
   "author": "David Hewitt <hello@wp-unite.io>",
