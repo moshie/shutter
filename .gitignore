@@ -1,11 +1,16 @@
-/node_modules/
+# OS
 .DS_Store
 .db_thumbs
+
+# Build
+/node_modules/
 /.sass-cache
-/.idea
 /screenshots
 /comparisons/*.jpg
 /comparisons/*.png
 chunk-*.json
 npm-debug.log
 /dist
+
+# IDE
+/.idea

@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha --opts mocha.opts && rm -rf test",
-    "test:auto": "mocha --opts mocha.opts --watch",
+    "test:watch": "mocha --opts mocha.opts --watch",
     "compile": "tsc",
-    "tscw": "tsc -w",
+    "compile:watch": "tsc -w",
     "prepublish": "npm run compile",
     "start": "node dist/index.js"
   },
@@ -19,6 +19,7 @@
   "bin": {
     "shutter": "./dist/index.js"
   },
+  "preferGlobal": true,
   "author": "David Hewitt <hello@wp-unite.io>",
   "license": "MIT",
   "devDependencies": {
