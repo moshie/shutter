@@ -55,6 +55,7 @@ This tool can also be further configured with the following command line flags.
         --version       output the version number
 
 ## Notes
+ - Be patient the crawling and screenshot process are very cpu intensive
  - The first site passed to the command defines the internal page paths for all of the other sites
  - Any Sites Larger than (600 pages +) will fail (Don't try an crawl google :$)
 
@@ -68,6 +69,7 @@ This tool can also be further configured with the following command line flags.
  - Module support
  - Better windows support
  - Spinners / loading bars to indicate time taken
+ - Performance optimization
 
 ## Licence
 
