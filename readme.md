@@ -64,9 +64,10 @@ This tool can also be further configured with the following command line flags.
     - Concurrency
     - Chunk size
     - Crawler depth
-    - 
+    - And many more
  - Module support
- - 
+ - Better windows support
+ - Spinners / loading bars to indicate time taken
 
 ## Licence
 
