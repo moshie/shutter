@@ -1,5 +1,5 @@
 function isJson(json: string): boolean {
-	
+    
     try {
         JSON.parse(json);
     } catch (e) {

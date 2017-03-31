@@ -19,17 +19,22 @@ class Screenshot {
         this.base = base;
     }
 
-	run(paths: string[]) : Promise<environmentsInterface> {
+	run(paths: string|string[]) : Promise<environmentsInterface> {
+        if (typeof paths === 'string') {
+            // Handle the json/yaml file assigning the paths
+            paths = []
+        }
+
 		let chunkedPaths: string[][] = chunk(paths, 6)
 
         return this.multiScreenshot(chunkedPaths)
 	}
 
-    multiScreenshot(chunkedPaths: string[][]): Promise<string[]> {
-        return Promise.map(chunkedPaths, (chunk: string[], index: number): Promise<string[]> => this.screenshot(chunk, index))
+    multiScreenshot(chunkedPaths: string[][]): Promise<any> {
+        return Promise.map(chunkedPaths, (chunk: string[], index: number): Promise<any> => this.screenshot(chunk, index))
     }
 
-    screenshot(chunk: string[], index: number) {
+    screenshot(chunk: string[], index: number): Promise<environmentsInterface> {
         let filename: string = path.resolve(this.base, `chunk-${index}.json`);
 
         return this.writeChunkFile(filename, chunk)
@@ -52,11 +57,11 @@ class Screenshot {
             )
         }
 
-        return Promise.all(chunkQueue).then((result: string[]) => chunkFilename)
+        return Promise.all(chunkQueue).then(() => chunkFilename)
     }
 
     removeChunk(chunkFilename: string): Promise<environmentsInterface> {
-
+        return fs.unlinkAsync(chunkFilename)
     }
 
 }
