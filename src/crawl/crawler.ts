@@ -1,11 +1,13 @@
 "use strict"
 
+import * as URL from 'url'
 import * as Promise from 'bluebird'
 import * as Spider from 'node-spider'
+
 import Document from 'node-spider/lib/document'
 import {environmentsInterface} from '../cli/environments-interface'
 
-class Crawler {
+export default class Crawler {
 
     /**
      * Screenshot environments
@@ -44,6 +46,17 @@ class Crawler {
     checked: string[] = []
 
     /**
+     * Extension whitelist
+     * @type {string[]}
+     */
+    whiteList: string[] = [
+        'html', 'htm', 'xhtml', 'jhtml',
+        'php', 'php3', 'php4', 'phtml',
+        'asp', 'aspx', 'axd', 'asmx', 'ashx',
+        'rhtml', 'shtml', 'xml'
+    ]
+
+    /**
      * Crawler constructor
      * 
      * @param {environmentsInterface} environments
@@ -55,7 +68,8 @@ class Crawler {
     }
 
     /**
-     * Crawl 
+     * Crawl
+     * 
      * @return {Promise<any>} [description]
      */
     crawl(): Promise<any> {
@@ -67,52 +81,130 @@ class Crawler {
                 headers: { 'user-agent': this.userAgent }
             })
 
-            this.spider.queue(this.domain, (doc: Document) => this.pageHandler(doc))
+            this.spider.queue(this.domain, this.pageHandler)
         })
     }
 
+    /**
+     * Handle the link crawling
+     * 
+     * @param {Document} doc
+     */
     protected pageHandler(doc: Document): void {
         var self = this;
         doc.$('a[href]').each(function (i: number, elem: any) {
-            let href: string = doc.$(this).attr('href')
+            let hyperlink: string = doc.$(this).attr('href')
 
-            href = self.removeHashes(href)
+            hyperlink = self.removeHashes(hyperlink)
 
-            if (!validProtocol(href) || this.checked.indexOf(href) !== -1 || hasInvalidExtension(href)) {
+            if (self.invalidHyperlink(hyperlink) || self.checked.indexOf(hyperlink) !== -1) {
                 return true
             }
 
-            this.checked.push(href)
+            self.checked.push(hyperlink)
 
-            if (isAbsoluteUrl(domain, href)) {
-                // Absolute
-                var url: string = checkShorthandUrl(href)
-                href = URL.parse(url).pathname
-                href = href.replace(/^(\/)/, '')
-                var next: string = url
-            } else {
-                if (/^(https?\:\/\/)/.test(href)) {
-                    return true;
-                }
-                // Relative
-                href = href.replace(/^(\/)/, '')
-                var next: string = mergePathname(domain, href)
-            }
+            let {next, href} = self.handleAbsolution(hyperlink)
 
-            if (paths.indexOf(href) !== -1) {
+            if (self.paths.indexOf(href) !== -1) {
                 return true
             }
 
-            paths.push(href)
+            self.paths.push(href)
 
-            spider.queue(next, (doc: Document) => handleRequest(spider, doc, domain))
+            self.spider.queue(next, self.pageHandler)
         })
     }
 
-    protected error(error: Error, url: string) {
+    /**
+     * [invalidHyperlink description]
+     * @param  {string}  hyperlink [description]
+     * @return {boolean}           [description]
+     */
+    protected invalidHyperlink(hyperlink: string): boolean {
+        return this.invalidProtocal(hyperlink) || this.invalidExtension(hyperlink)
+    }
 
+    /**
+     * Check if extension is invalid
+     * 
+     * @param  {string}  hyperlink
+     * @return {boolean}
+     */
+    protected invalidExtension(hyperlink: string): boolean {
+        let extension: RegExp = new RegExp('(?:\.([a-z]+))$')
+        let matches: string[]|null = extension.exec(hyperlink)
+        return extension.test(hyperlink) && this.whiteList.indexOf(matches[1]) === -1
+    }
+
+    /**
+     * Check if a protocal exists and it is valid
+     * 
+     * @param  {string}  hyperlink
+     * @return {boolean}
+     */
+    protected invalidProtocal(hyperlink: string): boolean {
+        let protocalRegex: RegExp = new RegExp('^(?:[a-z]+(?=\:))')
+        let whiteListProtocals: RegExp = new RegExp('^(https?)')
+
+        return protocalRegex.test(hyperlink) && !whiteListProtocals.test(hyperlink)
+    }
+
+    /**
+     * Remove Hashes from the url
+     * 
+     * @param  {string} href
+     * @return {string}
+     */
+    protected removeHashes(href: string): string {
+        var parsedUrl: URL.Url = URL.parse(href)
+        parsedUrl.hash = undefined
+
+        return URL.format(parsedUrl)
+    }
+
+    /**
+     * Retrieve the next page to crawl
+     * Convert the hyperlink to an absolute url
+     * 
+     * @param {string} href [description]
+     */
+    protected handleAbsolution(href: string): {next: string, href: string} {
+        var obj = {next: href, href}
+        var absolute = this.isAbsolute(href)
+
+        if (absolute !== null && absolute[1].length > 1) {
+            obj['next'] = this.addProtocal(href)
+            obj['href'] = absolute[1][0] == '/' ? absolute[1].slice(1) : absolute[1];
+        } else {
+            let relativePath: string = href.replace(/^(\/)/, '');
+            obj['next'] = this.domain + relativePath
+            obj['href'] = relativePath
+        }
+
+        return obj
+    }
+
+    /**
+     * Ensure the protocal is prepended
+     * 
+     * @param  {string} href
+     * @return {string}
+     */
+    protected addProtocal(href: string): string {
+        return /^(https?)/.test(href) ? href : `http://${href}`
+    }
+
+    /**
+     * Check if the hyperlink is absolute
+     * 
+     * @param  {string} href
+     * @return {null|string}
+     */
+    protected isAbsolute(href: string): null|string[] {
+        let {hostname, pathname} = URL.parse(this.domain)
+
+        let absolute = new RegExp('^(?:(?:https?:\/\/)?(?:www\.)?(?:' + hostname.replace(/(www\.)/, '') + pathname + ')(.*))')
+        return href.match(absolute)
     }
 
 }
-
-export default Crawler

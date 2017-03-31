@@ -104,7 +104,7 @@ export default class Screenshot {
      * @return {Promise<string>}
      */
     protected screenshotChunk(chunkFilename: string): Promise<string> {
-        let chunkQueue: Promise<string[]>[] = []
+        let chunkQueue: Promise<any>[] = []
         let environments: string[] = Object.keys(this.environments)
 
         for (let environment in environments) {

@@ -1,8 +1,14 @@
+import validation from './validation'
 import {environmentsInterface} from './environments-interface'
 
 function sanitize(rawEnvironments: string[]) {
 
-    // TODO: Validate the input!
+	try {
+		validation(rawEnvironments)
+	} catch (error) {
+		console.log(error) // TODO: Swap out for error handler
+		process.exit(1)
+	}
 
     let sanitized: environmentsInterface = {};
 
