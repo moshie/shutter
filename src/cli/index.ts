@@ -3,10 +3,10 @@ import * as Promise from 'bluebird'
 import Compare from '../compare'
 import sanitize from './sanitizer'
 import Screenshot from '../screenshot'
-import {directoriesExistIn} from '../utilities'
-import environmentsInterface from './environments-interface'
+import directoriesExistIn from '../utilities/directories-exist-in'
+import {environmentsInterface} from './environments-interface'
 
-export function handleScreenshot(rawEnvironments: string[], options: any): Promise<string[]> {
+export function handleScreenshots(rawEnvironments: string[], options: any): Promise<string[]> {
 
 	const environments: environmentsInterface = sanitize(rawEnvironments)
 	const capture = (new Screenshot(environments, options.directory)).run
@@ -23,7 +23,7 @@ export function handleCompare(original: string, comparison: string, options: any
 
 	let environments: string[] = [`original=${original}`, `comparison=${comparison}`]
 
-	return handleScreenshot(environments, options)
+	return handleScreenshots(environments, options)
 		.then((environments: string[]) => handleCompare('original', 'comparison', options))
 		.catch((error: any) => console.log(error)) // TODO(David): Create error handler function
 }

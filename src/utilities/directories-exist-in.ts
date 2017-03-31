@@ -2,4 +2,4 @@ function directoriesExistIn(base: string, ...paths: string[]) {
 	
 }
 
-export directoriesExistIn
+export default directoriesExistIn

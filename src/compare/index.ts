@@ -1,4 +1,3 @@
-import environmentsInterface from '../cli/environments-interface'
 
 class Compare {
 
