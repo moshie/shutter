@@ -1,9 +1,11 @@
+"use strict"
+
 import * as Promise from 'bluebird'
 
 import sanitize from './sanitizer'
-import Crawler from '../crawl/index'
-import Compare from '../compare/index'
-import Screenshot from '../screenshot/index'
+import Crawler from '../crawl/crawler'
+import Compare from '../compare/compare'
+import Screenshot from '../screenshot/screenshot'
 import {optionsInterface} from './options-interface'
 import {environmentsInterface} from './environments-interface'
 import directoriesExistIn from '../utilities/directories-exist-in'

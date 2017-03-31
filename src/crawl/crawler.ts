@@ -1,3 +1,5 @@
+"use strict"
+
 import * as Promise from 'bluebird'
 import * as Spider from 'node-spider'
 import Document from 'node-spider/lib/document'
@@ -38,7 +40,7 @@ class Crawler {
 
             href = self.removeHashes(href)
 
-            if (!validProtocol(href) || checked.indexOf(href) !== -1 || hasInvalidExtension(href)) {
+            if (!validProtocol(href) || this.checked.indexOf(href) !== -1 || hasInvalidExtension(href)) {
                 return true
             }
 
