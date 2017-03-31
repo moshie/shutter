@@ -1,8 +1,9 @@
 import * as Promise from 'bluebird'
 
-import compare from '../compare'
+import Compare from '../compare'
 import sanitize from './sanitizer'
 import Screenshot from '../screenshot'
+import {directoriesExistIn} from '../utilities'
 import environmentsInterface from './environments-interface'
 
 export function handleScreenshot(rawEnvironments: string[], options: any): Promise<string[]> {
