@@ -1,13 +1,12 @@
 import * as Promise from 'bluebird'
 
-import Compare from '../compare/index'
-import crawl from '../crawl'
 import sanitize from './sanitizer'
-import Screenshot from '../screenshot/index'
-import directoriesExistIn from '../utilities/directories-exist-in'
-import {environmentsInterface} from './environments-interface'
-import {optionsInterface} from './options-interface'
 import Crawler from '../crawl/index'
+import Compare from '../compare/index'
+import Screenshot from '../screenshot/index'
+import {optionsInterface} from './options-interface'
+import {environmentsInterface} from './environments-interface'
+import directoriesExistIn from '../utilities/directories-exist-in'
 
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): Promise<environmentsInterface> {
 
