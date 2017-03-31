@@ -1,5 +1,6 @@
 "use strict"
 
+import * as ora from 'ora'
 import * as path from 'path'
 import * as fileSystem from 'fs'
 import * as Promise from 'bluebird'
@@ -57,7 +58,10 @@ export default class Screenshot {
 
         let chunkedPaths: string[][] = chunk(paths, 6)
 
+        const spinner = ora(`Capturing paths 🏞`).start()
         return this.multiScreenshot(chunkedPaths)
+            .then(() => spinner.succeed('Paths captured successfully'))
+            .catch((error: string) => spinner.fail(error.message));
     }
 
     /**
@@ -67,7 +71,9 @@ export default class Screenshot {
      * @return {Promise<any>}
      */
     protected multiScreenshot(chunkedPaths: string[][]): Promise<any> {
-        return Promise.map(chunkedPaths, this.screenshot)
+        return Promise.map(chunkedPaths, (chunk: string[], index: number) => {
+            return this.screenshot(chunk, index)
+        }, {concurrency: 6})
     }
 
     /**
@@ -81,9 +87,8 @@ export default class Screenshot {
         let filename: string = path.resolve(this.base, `chunk-${index}.json`);
 
         return this.writeChunkFile(filename, chunk)
-                .then(this.screenshotChunk)
-                .then(this.removeChunk)
-                .catch((error: string) => console.log(error));
+                .then((chunkFilename: string) => this.screenshotChunk(filename))
+                .then((chunkFilename: string) => this.removeChunk(filename))
     }
 
     /**
@@ -107,13 +112,13 @@ export default class Screenshot {
         let chunkQueue: Promise<any>[] = []
         let environments: string[] = Object.keys(this.environments)
 
-        for (let environment in environments) {
+        for (var i = environments.length - 1; i >= 0; i--) {
             chunkQueue.push(
-                this.capturer.capture(chunkFilename, environment)
+                this.capturer.capture(chunkFilename, environments[i])
             )
         }
 
-        return Promise.all(chunkQueue).then(() => chunkFilename)
+        return Promise.join(...chunkQueue).then(() => chunkFilename)
     }
 
     /**
@@ -122,7 +127,7 @@ export default class Screenshot {
      * @param  {string} chunkFilename
      * @return {Promise<environmentsInterface>}
      */
-    protected removeChunk(chunkFilename: string): Promise<environmentsInterface> {
+    protected removeChunk(chunkFilename: string): Promise<any> {
         return fs.unlinkAsync(chunkFilename)
     }
 

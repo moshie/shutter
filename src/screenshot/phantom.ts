@@ -32,7 +32,7 @@ export default class Phantom implements CapturerInterface {
      * Path to the phantomjs script 
      * @param {string} script
      */
-    static script: string = path.resolve(__dirname, 'screenshot.phantom.js')
+    static script: string = path.resolve(__dirname, 'phantom', 'screenshot.phantom.js')
 
     /**
      * Phantom constructor
@@ -51,14 +51,19 @@ export default class Phantom implements CapturerInterface {
      * @return {Promise<any>}
      */
     capture(chunkFilename: string, environment: string): Promise<any> {
-        let domain: string = this.environments[environment]
+        var domain: string = this.environments[environment]
 
         return new Promise((resolve, reject): void => {
             const phantom = shell(Phantom.executable, [Phantom.script, chunkFilename, domain, environment])
 
             phantom.stdout.on('data', (data: NodeBuffer) => {
                 var out: string = data.toString('utf8')
-                this.paths = isJson(out) ? JSON.parse(out) : [];
+                if (isJson(out)) {
+                    this.paths = JSON.parse(out)
+                } else {
+                    // Verbose
+                    //console.log(out)
+                }
             })
 
             phantom.stderr.on('data', (data: NodeBuffer) => {

@@ -1,13 +1,9 @@
-declare var phantom: any;
-/**
- * This needs to be a seperate build process as the types clash with node
- */
 // Phantomjs doesn't like the way typescript compiles es6 module imports
 const webpage = require('webpage');
 const system = require('system');
 const fs = require('fs');
 
-const isJson = require('./is-json').default;
+const isJson = require('../../utilities/is-json').default;
 const sanitizePath = require('./sanitize-path').default;
 
 var page: any = webpage.create()

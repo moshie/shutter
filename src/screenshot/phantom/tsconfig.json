@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "outDir": "../../../dist/screenshot/phantom",
+        "module": "commonjs",
+        "declaration": true,
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "noEmitOnError": false,
+        "pretty": true,
+        "types": ["phantomjs"]
+    },
+    "files": [
+        "screenshot.phantom.ts",
+        "sanitize-path.ts"
+    ]
+}

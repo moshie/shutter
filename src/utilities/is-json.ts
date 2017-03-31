@@ -1,4 +1,4 @@
-function isJson(json: string): boolean {
+export default function isJson(json: string): boolean {
     
     try {
         JSON.parse(json);
@@ -8,5 +8,3 @@ function isJson(json: string): boolean {
 
     return true;
 }
-
-export default isJson;

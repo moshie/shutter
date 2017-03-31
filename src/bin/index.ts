@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as program from 'commander'
 
-const version = require('../package').version
+const version = require('../../package').version
 import {handleScreenshots, handleCompare} from '../cli'
 
 program.version(version)

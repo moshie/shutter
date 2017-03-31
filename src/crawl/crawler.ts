@@ -1,5 +1,6 @@
 "use strict"
 
+import * as ora from 'ora'
 import * as URL from 'url'
 import * as Promise from 'bluebird'
 import * as Spider from 'node-spider'
@@ -73,15 +74,22 @@ export default class Crawler {
      * @return {Promise<any>} [description]
      */
     crawl(): Promise<any> {
+        const spinner = ora(`Crawling ${this.domain} `).start()
         return new Promise((resolve, reject) => {
             this.spider = new Spider({
                 concurrent: 20,
-                error: (error: Error, url: string) => reject(error),
-                done: () => resolve(this.paths),
+                error: (error: Error, url: string) => {
+                    spinner.warn(`unable to crawl ${url}`)
+                    reject(error)
+                },
+                done: () => {
+                    spinner.succeed('Crawling complete')
+                    resolve(this.paths)
+                },
                 headers: { 'user-agent': this.userAgent }
             })
 
-            this.spider.queue(this.domain, this.pageHandler)
+            this.spider.queue(this.domain, (doc: Document) => this.pageHandler(doc))
         })
     }
 
@@ -95,6 +103,10 @@ export default class Crawler {
         doc.$('a[href]').each(function (i: number, elem: any) {
             let hyperlink: string = doc.$(this).attr('href')
 
+            if (i > 1000000) {
+                return false
+            }
+
             hyperlink = self.removeHashes(hyperlink)
 
             if (self.invalidHyperlink(hyperlink) || self.checked.indexOf(hyperlink) !== -1) {
@@ -105,13 +117,13 @@ export default class Crawler {
 
             let {next, href} = self.handleAbsolution(hyperlink)
 
-            if (self.paths.indexOf(href) !== -1) {
+            if (self.paths.indexOf(href) !== -1 || /^(https?\:\/\/)/.test(href)) {
                 return true
             }
 
             self.paths.push(href)
 
-            self.spider.queue(next, self.pageHandler)
+            self.spider.queue(next, (doc: Document) => self.pageHandler(doc))
         })
     }
 

@@ -12,10 +12,11 @@ import directoriesExistIn from '../utilities/directories-exist-in'
 
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): Promise<environmentsInterface> {
 
+	// TODO: Works However could benefit from speed improvement
 	const environments: environmentsInterface = sanitize(rawEnvironments)
-	const capture = (new Screenshot(environments, options.directory)).run
+	const capture = new Screenshot(environments, options.directory)
 	const crawler = new Crawler(environments)
-	const operation = options.paths ? capture(options.paths) : crawler.crawl().then(capture)
+	const operation = options.paths ? capture.run(options.paths) : crawler.crawl().then((paths: string[]) => capture.run(paths))
 
 	return operation.catch((error: any) => console.log(error)) // TODO(David): Create error handler function
 }
