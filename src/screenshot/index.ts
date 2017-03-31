@@ -10,7 +10,7 @@ import {environmentsInterface} from '../cli/environments-interface'
 class Screenshot {
 
     environments: environmentsInterface
-    capturer: Capturer
+    capturer: Phantom
     base: string
 
 	constructor(environments: environmentsInterface, base: string = process.cwd()) { 
@@ -52,7 +52,7 @@ class Screenshot {
             )
         }
 
-        return Promise.all(chunkQueue).then(() => chunkFilename)
+        return Promise.all(chunkQueue).then((result: string[]) => chunkFilename)
     }
 
     removeChunk(chunkFilename: string): Promise<environmentsInterface> {
