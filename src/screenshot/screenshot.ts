@@ -56,14 +56,13 @@ export default class Screenshot {
             paths = []
         }
 
-        let chunkedPaths: string[][] = chunk(paths, 6)
+        let chunkedPaths: string[][] = chunk(paths, 8)
 
         const spinner = ora(`Capturing paths 🏞`).start()
         return this.multiScreenshot(chunkedPaths)
             .then(() => spinner.succeed('Paths captured successfully'))
             .catch((error: any) => {
-                var message = typeof error === 'object' ? error.message : error;
-                spinner.fail(message)
+                console.log(error)
             });
     }
 

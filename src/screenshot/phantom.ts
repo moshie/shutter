@@ -62,13 +62,13 @@ export default class Phantom implements CapturerInterface {
                     this.paths = JSON.parse(out)
                 } else {
                     // Verbose
-                    //console.log(out)
+                    console.log(out)
                 }
             })
 
             phantom.stderr.on('data', (data: NodeBuffer) => {
                 var message: string = data.toString('utf8')
-                reject(message)
+                reject('Error: ' + message)
             })
 
             phantom.on('close', (code: number) => resolve(this.paths))

@@ -1,12 +1,9 @@
 // Phantomjs doesn't like the way typescript compiles es6 module imports
-const webpage = require('webpage');
 const system = require('system');
 const fs = require('fs');
 
 const isJson = require('../../utilities/is-json').default;
 const sanitizePath = require('./sanitize-path').default;
-
-var page: any = webpage.create()
 
 console.error = (error: string) => {
     system.stderr.write(error + '\n')
@@ -38,75 +35,77 @@ if (!rawPaths) {
     phantom.exit()
 }
 
-var paths: string[] = [];
+var URLS: string[] = [];
 
 if (isJson(rawPaths)) {
-    paths = JSON.parse(rawPaths)
+    URLS = JSON.parse(rawPaths)
 } else {
     console.error('Parsing JSON Failed!')
     phantom.exit()
 }
 
-if (!Array.isArray(paths)) {
+if (!Array.isArray(URLS)) {
     console.error('paths content must be a type of [Object array]')
 }
 
-const page_width = 1600
-const page_height = 1800
+var SCREENSHOT_WIDTH = 1280; 
+var SCREENSHOT_HEIGHT = 900; 
+var LOAD_WAIT_TIME = 1000;
 
-page.viewportSize = { width: page_width, height: page_height }
-
-page.settings.resourceTimeout = 10000;
-page.onError = function(msg: string, trace: string|any[]) {}
-phantom.onError = function(msg, trace) {
-    var msgStack = ['PHANTOM ERROR: ' + msg];
-    if (trace && trace.length) {
-        msgStack.push('TRACE:');
-        trace.forEach(function(t: any) {
-            msgStack.push(' -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function +')' : ''));
-        });
-    }
-    console.error(msgStack.join('\n'));
-    phantom.exit(1);
-};
-
-var pathCollection: string[] = []
-
-var count: number = 0
-
-function handlePage() {
-
-    var url: string = domain + paths[count]
-
-    console.log(url)
-
-    page.open(url, (status: string) => {
-        if (status !== 'success') {
-            console.error(url)
-            nextPage()
-        }
-
-        var id: string = sanitizePath(paths[count])
-        var output: string = `${fs.workingDirectory}/${environment}/${id}_${page_width}x${page_height}.png`
-        
-        try {
-            page.render(output)
-        } catch (e) {
-            console.error(e);
-        }
-        pathCollection.push(output)
-        count++
-        nextPage()
+var getPageTitle = function(page){
+    var documentTitle = page.evaluate(function(){
+        return document.title; 
     })
+    return documentTitle; 
 }
 
-function nextPage() {
-    if (typeof paths[count] === 'undefined') {
-        console.log(JSON.stringify(pathCollection))
-        phantom.exit()
+var getPageHeight = function(page){
+    var documentHeight = page.evaluate(function() { 
+        return document.body.offsetHeight; 
+    })
+    return documentHeight; 
+}
+
+var renderPage = function(page){
+
+    var title =  getPageTitle(page);
+
+    var pageHeight = getPageHeight(page); 
+
+    page.clipRect = {
+        top:0,left:0,width: SCREENSHOT_WIDTH, 
+        height: pageHeight
+    };
+
+    var id = sanitizePath(URLS[index]);
+    page.render(`${fs.workingDirectory}/${environment}/${id}_${SCREENSHOT_WIDTH}x${pageHeight}.png`);
+}
+
+var exitIfLast = function(index,array){
+    if (index == array.length-1){
+        phantom.exit();
+    }
+}
+
+var takeScreenshot = function(element){
+
+    var page = require("webpage").create();
+
+    page.viewportSize = {width:SCREENSHOT_WIDTH, height:SCREENSHOT_HEIGHT};
+
+    page.open(domain + element);
+
+    page.onLoadFinished = function() {
+        setTimeout(function(){
+            renderPage(page)
+            exitIfLast(index,URLS)
+            index++; 
+            takeScreenshot(URLS[index]);
+        },LOAD_WAIT_TIME)
     }
 
-    handlePage()
 }
 
-nextPage()
+var index = 0; 
+
+takeScreenshot(URLS[index]);
