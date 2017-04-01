@@ -1,6 +1,6 @@
 {
   "name": "site-shutter",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Shutter captures screenshots of internal website pages and compares them for differences",
   "main": "dist/index.js",
   "scripts": {
@@ -45,7 +45,7 @@
     "chalk": "^1.1.3",
     "commander": "^2.9.0",
     "node-spider": "^1.4.1",
-    "phantomjs": "^2.1.7",
+    "phantomjs-prebuilt": "^2.1.14",
     "typescript": "^2.2.1"
   }
 }
