@@ -61,7 +61,10 @@ export default class Screenshot {
         const spinner = ora(`Capturing paths 🏞`).start()
         return this.multiScreenshot(chunkedPaths)
             .then(() => spinner.succeed('Paths captured successfully'))
-            .catch((error: string) => spinner.fail(error.message));
+            .catch((error: any) => {
+                var message = typeof error === 'object' ? error.message : error;
+                spinner.fail(message)
+            });
     }
 
     /**

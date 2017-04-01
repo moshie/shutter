@@ -47,7 +47,7 @@
     "commander": "^2.9.0",
     "node-spider": "^1.4.1",
     "ora": "^1.2.0",
-    "phantomjs": "^2.1.7",
+    "phantomjs-prebuilt": "^2.1.14",
     "typescript": "^2.2.1"
   }
 }

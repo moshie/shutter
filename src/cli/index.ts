@@ -23,6 +23,7 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
 
 export function handleCompare(original: string, comparison: string, options: optionsInterface): Promise<any> {
 
+	// TODO: Implement directoriesExistIn!
 	if (directoriesExistIn(options.directory || process.cwd(), original, comparison)) {
 		return (new Compare(original, comparison, options.directory)).run()
 	}
@@ -30,6 +31,9 @@ export function handleCompare(original: string, comparison: string, options: opt
 	let environments: string[] = [`original=${original}`, `comparison=${comparison}`]
 
 	return handleScreenshots(environments, options)
-		.then((environments: environmentsInterface) => handleCompare('original', 'comparison', options))
+		.then((environments: environmentsInterface) => {
+			console.log('Started');
+			return handleCompare('original', 'comparison', options)
+		})
 		.catch((error: any) => console.log(error)) // TODO(David): Create error handler function
 }

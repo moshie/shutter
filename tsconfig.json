@@ -12,7 +12,10 @@
             "bluebird",
             "chalk",
             "commander",
-            "node"
+            "node",
+            "mocha",
+            "mock-fs",
+            "chai"
         ]
     },
     "exclude": [

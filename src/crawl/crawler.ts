@@ -98,7 +98,7 @@ export default class Crawler {
      * 
      * @param {Document} doc
      */
-    protected pageHandler(doc: Document): void {
+    pageHandler(doc: Document): void {
         var self = this;
         doc.$('a[href]').each(function (i: number, elem: any) {
             let hyperlink: string = doc.$(this).attr('href')
@@ -132,7 +132,7 @@ export default class Crawler {
      * @param  {string}  hyperlink [description]
      * @return {boolean}           [description]
      */
-    protected invalidHyperlink(hyperlink: string): boolean {
+    invalidHyperlink(hyperlink: string): boolean {
         return this.invalidProtocal(hyperlink) || this.invalidExtension(hyperlink)
     }
 
@@ -142,7 +142,7 @@ export default class Crawler {
      * @param  {string}  hyperlink
      * @return {boolean}
      */
-    protected invalidExtension(hyperlink: string): boolean {
+    invalidExtension(hyperlink: string): boolean {
         let extension: RegExp = new RegExp('(?:\.([a-z]+))$')
         let matches: string[]|null = extension.exec(hyperlink)
         return extension.test(hyperlink) && this.whiteList.indexOf(matches[1]) === -1
@@ -154,7 +154,7 @@ export default class Crawler {
      * @param  {string}  hyperlink
      * @return {boolean}
      */
-    protected invalidProtocal(hyperlink: string): boolean {
+    invalidProtocal(hyperlink: string): boolean {
         let protocalRegex: RegExp = new RegExp('^(?:[a-z]+(?=\:))')
         let whiteListProtocals: RegExp = new RegExp('^(https?)')
 
@@ -167,7 +167,7 @@ export default class Crawler {
      * @param  {string} href
      * @return {string}
      */
-    protected removeHashes(href: string): string {
+    removeHashes(href: string): string {
         var parsedUrl: URL.Url = URL.parse(href)
         parsedUrl.hash = undefined
 
@@ -180,7 +180,7 @@ export default class Crawler {
      * 
      * @param {string} href [description]
      */
-    protected handleAbsolution(href: string): {next: string, href: string} {
+    handleAbsolution(href: string): {next: string, href: string} {
         var obj = {next: href, href}
         var absolute = this.isAbsolute(href)
 
@@ -202,7 +202,7 @@ export default class Crawler {
      * @param  {string} href
      * @return {string}
      */
-    protected addProtocal(href: string): string {
+    addProtocal(href: string): string {
         return /^(https?)/.test(href) ? href : `http://${href}`
     }
 
@@ -212,7 +212,7 @@ export default class Crawler {
      * @param  {string} href
      * @return {null|string}
      */
-    protected isAbsolute(href: string): null|string[] {
+    isAbsolute(href: string): null|string[] {
         let {hostname, pathname} = URL.parse(this.domain)
 
         let absolute = new RegExp('^(?:(?:https?:\/\/)?(?:www\.)?(?:' + hostname.replace(/(www\.)/, '') + pathname + ')(.*))')
