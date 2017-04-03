@@ -2,18 +2,9 @@
 
 import * as trumpet from 'trumpet'
 import * as request from 'request'
+import * as URL from 'url'
 import { Readable } from 'stream'
-
-declare interface crawlerOptionsInterface {
-    concurrent?: number
-    headers?: any
-    xhr: boolean
-    keepAlive: boolean
-}
-
-declare interface visitedInterface {
-    [key: string]: boolean
-}
+import { crawlerOptionsInterface, sitesVisited } from './interfaces'
 
 class Crawler extends Readable {
 
@@ -49,9 +40,9 @@ class Crawler extends Readable {
 
     /**
      * Urls already visited
-     * @type {visitedInterface}
+     * @type {sitesVisited}
      */
-    visited: visitedInterface = {}
+    visited: sitesVisited = {}
 
     /**
      * Crawler constructor
@@ -72,8 +63,8 @@ class Crawler extends Readable {
      */
     handleOptions(options: crawlerOptionsInterface): crawlerOptionsInterface {
         options = options || {}
-        options.concurrent = opts.concurrent || 1
-        options.headers = opts.headers || {}
+        options.concurrent = options.concurrent || 1
+        options.headers = options.headers || {}
 
         if (options.xhr) {
             options.headers['X-Requested-With'] = 'XMLHttpRequest'
@@ -187,19 +178,100 @@ class Crawler extends Readable {
         }
     }
 
+
+
+
+    /**
+     * SEPERATE THIS?
+     */
+
+
+
+
+
+    /**
+     * Remove www from am url
+     * 
+     * @param  {string} url
+     * @return {string}
+     */
+    removeWww(url: string): string {
+        let wwwRegex: RegExp = new RegExp('^(www\.)')
+
+        return url.replace(wwwRegex, '')
+    }
+
+    /**
+     * Check if the url has a valid protocol
+     * 
+     * @param  {URL.Url} url
+     * @return {boolean}
+     */
+    validProtocol(url: URL.Url): boolean {
+        let validProtocol: RegExp = new RegExp('^(https?)')
+
+        return url.protocol !== null && validProtocol.test(url.protocol)
+    }
+
+    getBase(): URL.Url {
+        return URL.parse(this.url)
+    }
+
+    /**
+     * Check if the host is correct for an absolute link
+     * 
+     * @param  {URL.Url} hyperlink
+     * @return {boolean}
+     */
+    correctHost(hyperlink: URL.Url): boolean {
+        let base: URL.Url = this.getBase()
+        let slashesRegex: RegExp = new RegExp('^\/|\/$', 'g')
+
+        let hyperlinkPath: string = hyperlink.path.replace(slashesRegex, '')
+        let basePath: string = base.path.replace(slashesRegex, '')
+
+        return this.removeWww(`${base.host}/${basePath}`) == this.removeWww(`${hyperlink.host}/${hyperlinkPath}`)
+    }
+
+    /**
+     * Check if Hyperlink is an Absolute url
+     * 
+     * @param  {URL.Url} hyperlink
+     * @return {boolean}
+     */
+    isAbsolute(hyperlink: URL.Url): boolean {
+        return this.validProtocol(hyperlink) && this.correctHost(hyperlink)
+    }
+
+    /**
+     * Check if the hyperlink is a relative path
+     * 
+     * @param  {URL.Url} hyperlink
+     * @return {boolean}
+     */
+    isRelative(hyperlink: URL.Url): boolean {
+
+        let slashesRegex: RegExp = new RegExp('^\/|\/$', 'g')
+
+        let hyperlinkPath: string = hyperlink.path.replace(slashesRegex, '')
+        let basePath: string = this.getBase().path.replace(slashesRegex, '')
+
+        return !hyperlink.protocol && hyperlink.pathname && (!basePath.length || hyperlinkPath == basePath)
+    }
+
     /**
      * Handle retreval of urls
      * 
      * @param {any} element
      */
     handleElement(element: any): void {
-        element.getAttribute('href', (hyperlink) => {
+        element.getAttribute('href', (value) => {
 
-            if (this.visited[hyperlink]) {
-                return
-            }
+            let hyperlink: URL.Url = URL.parse(value)
 
-            if (/^(mailto|tel|#|\/)/.test(hyperlink) || !/colprint.co.uk/.test(hyperlink)) {
+            hyperlink.hash = null
+
+            if (this.visited[URL.format(hyperlink)]) {
                 return
             }
 
@@ -208,8 +280,22 @@ class Crawler extends Readable {
                 this.chunk = []
             }
 
-            this.chunk.push(hyperlink)
-            this.queue(hyperlink)
+            let next = ''
+            let path = hyperlink.path;
+
+            if (this.isAbsolute(hyperlink)) {
+                // Absolute
+                next = URL.format(hyperlink)
+            } else if (this.isRelative(hyperlink)) {
+                // Relative
+                next = this.getBase().pathname + (hyperlink[0] == '/' ? hyperlink : `/${hyperlink}`)
+            }
+
+            if (next) {
+                this.chunk.push(path)
+                this.queue(next)
+            }
+
         })
     }
 

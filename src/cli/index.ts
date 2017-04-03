@@ -12,10 +12,10 @@ import directoriesExistIn from '../utilities/directories-exist-in'
 
 import Crawler from '../crawl/site-crawler'
 
-export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): Promise<environmentsInterface> {
+export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): any {
 
 
-	const crawler = new Crawler('http://colprint.co.uk', { concurrency: 10 })
+	const crawler = new Crawler('http://colprint.co.uk', { concurrent: 10 })
 	//const screenshot = new Screenshot(environments, options.directory)
 
 	crawler.pipe(process.stdout)
