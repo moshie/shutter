@@ -122,9 +122,10 @@ class Crawler extends Readable {
     queue(url: string): void {
         if (this.visited[url]) return
 
-        if (!this.options.allowDuplicates) {
-            this.visited[url] = true
-        }
+
+        // if (!this.options.allowDuplicates) {
+        //     this.visited[url] = true
+        // }
 
         if (this.full()) {
             this.pending.push(url)
@@ -259,9 +260,10 @@ class Crawler extends Readable {
      */
     handlePush(path: string): void {
         this.chunk.push(path)
-        this.visited[path] = true
-        console.log(this.base.protocol + '//' + this.base.host + path)
+        //console.log(this.base.protocol + '//' + this.base.host + path)
         this.queue(this.base.protocol + '//' + this.base.host + path)
+        // TODO: ALREADY ADDED TO THE VISITING ARRAY NEED TO FIX THIS!
+        //this.visited[path] = true
         this.resetChunk()
     }
 
@@ -333,7 +335,7 @@ class Crawler extends Readable {
 
             hyperlink.hash = null
 
-            if (hyperlink.path == null || this.visited[hyperlink.path]) {
+            if (hyperlink.path == null) {
                 return
             }
 
