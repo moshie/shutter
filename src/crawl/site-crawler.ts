@@ -52,7 +52,7 @@ class Crawler extends Readable {
      */
     constructor(url: string, options: crawlerOptionsInterface) {
         super({})
-
+        this.url = url
         this.options = this.handleOptions(options)
     }
 
@@ -213,6 +213,11 @@ class Crawler extends Readable {
         return url.protocol !== null && validProtocol.test(url.protocol)
     }
 
+    /**
+     * Get the base domain url
+     * 
+     * @return {URL.Url}
+     */
     getBase(): URL.Url {
         return URL.parse(this.url)
     }
@@ -226,6 +231,10 @@ class Crawler extends Readable {
     correctHost(hyperlink: URL.Url): boolean {
         let base: URL.Url = this.getBase()
         let slashesRegex: RegExp = new RegExp('^\/|\/$', 'g')
+
+        if (hyperlink.path === null && !hyperlink.path) {
+            return false;
+        }
 
         let hyperlinkPath: string = hyperlink.path.replace(slashesRegex, '')
         let basePath: string = base.path.replace(slashesRegex, '')
@@ -253,10 +262,14 @@ class Crawler extends Readable {
 
         let slashesRegex: RegExp = new RegExp('^\/|\/$', 'g')
 
+        if (hyperlink.protocol !== null && !hyperlink.path) {
+            return false;
+        }
+
         let hyperlinkPath: string = hyperlink.path.replace(slashesRegex, '')
         let basePath: string = this.getBase().path.replace(slashesRegex, '')
 
-        return !hyperlink.protocol && hyperlink.pathname && (!basePath.length || hyperlinkPath == basePath)
+        return !basePath.length || hyperlinkPath == basePath
     }
 
     /**
@@ -271,7 +284,7 @@ class Crawler extends Readable {
 
             hyperlink.hash = null
 
-            if (this.visited[URL.format(hyperlink)]) {
+            if (this.visited[URL.format(hyperlink)] || hyperlink.path == '/' || hyperlink.path === null) {
                 return
             }
 
@@ -288,7 +301,8 @@ class Crawler extends Readable {
                 next = URL.format(hyperlink)
             } else if (this.isRelative(hyperlink)) {
                 // Relative
-                next = this.getBase().pathname + (hyperlink[0] == '/' ? hyperlink : `/${hyperlink}`)
+                let base = this.getBase()
+                next = `${base.protocol}//${base.host + (hyperlink.path[0] == '/' ? hyperlink.path : '/' + hyperlink.path)}`
             }
 
             if (next) {
