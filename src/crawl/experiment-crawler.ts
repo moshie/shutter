@@ -6,24 +6,24 @@ import * as request from 'request'
 
 class Crawler extends Readable {
     queue: queue
-    rawBaseUrl: string
-    baseUrl: URL.Url
+    baseUrl: string
+    parser: HyperlinkParser
     userAgent: string = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
 
     constructor(baseUrl: string) {
         super({ objectmode: true })
         this.queue = queue({ concurrency: 20 })
-        this.rawBaseUrl = baseUrl
-        this.baseUrl = URL.parse(baseUrl)
+        this.baseUrl = baseUrl
         this.parser = new HyperlinkParser(this)
     }
 
     _read(size: number) {
-        this.queue.push((next) => this.crawl(this.rawBaseUrl, next))
+        this.queue.push((next) => this.crawl(this.baseUrl, next))
     }
 
     crawl(url: string, next: () => void) {
-        let trumpet = this.parser.parse(trumpet())
+        let tr = trumpet()
+        tr = this.parser.parse(tr)
 
         request({ url, headers: { 'User-Agent': this.userAgent } }).pipe(trumpet)
 
@@ -34,15 +34,13 @@ class Crawler extends Readable {
 
 class HyperlinkParser {
 
-    trumpet: any = trumpet()
-
     crawler: Crawler
 
     constructor(crawler) {
         this.crawler = crawler
     }
 
-    parse(trumpet) {
+    parse(trumpet: any) {
         return trumpet.selectAll('a[href]', (element) => {
             element.getAttribute('href', (value) => {
                 this.crawler.push(chunk)
@@ -51,3 +49,9 @@ class HyperlinkParser {
         })
     }
 }
+
+
+// Implementation
+// const crawler = new Crawler('http://colprint.co.uk')
+
+// crawler.pipe(screenshot)
