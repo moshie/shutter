@@ -120,12 +120,13 @@ class Crawler extends Readable {
      * @param {string} url
      */
     queue(url: string): void {
-        if (this.visited[url]) return
+        if (this.visited[url]) {
+            return
+        }
 
-
-        // if (!this.options.allowDuplicates) {
-        //     this.visited[url] = true
-        // }
+        if (!this.options.allowDuplicates) {
+            this.visited[url] = true
+        }
 
         if (this.full()) {
             this.pending.push(url)
@@ -143,7 +144,17 @@ class Crawler extends Readable {
         this.active.push(url)
 
         var _trumpet = trumpet()
-        var _request = request(url)
+        var _request = request({
+            url,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+            }
+        })
+
+        // Debugging
+        // _request.on('response', (response) => {
+        //     console.log(response.statusCode)
+        // })
 
         _trumpet.selectAll('a[href]', (element) => this.handleElement(element))
 
@@ -171,7 +182,7 @@ class Crawler extends Readable {
         var args = this.pending.shift()
 
         if (args) {
-            this.load(referrer)
+            this.load(args)
         } else if (this.active.length === 0) {
             this.push(JSON.stringify(this.chunk))
             this.push(null)
@@ -260,10 +271,8 @@ class Crawler extends Readable {
      */
     handlePush(path: string): void {
         this.chunk.push(path)
-        //console.log(this.base.protocol + '//' + this.base.host + path)
         this.queue(this.base.protocol + '//' + this.base.host + path)
-        // TODO: ALREADY ADDED TO THE VISITING ARRAY NEED TO FIX THIS!
-        //this.visited[path] = true
+        this.visited[path] = true
         this.resetChunk()
     }
 
@@ -343,15 +352,41 @@ class Crawler extends Readable {
                 return
             }
 
+            // THIS IS FOR PATHNAMES WHICH MATCH ON THE CRITERIA SO WE CAN QUEUE OTHER PAGES
             if (this.matchingHostNames(hyperlink)) {
                 this.handlePush(hyperlink.path)
                 return
-            } else if (this.matchingPathnames(hyperlink)) {
+            }
+
+            if (this.matchingPathnames(hyperlink)) {
                 hyperlink = URL.parse(this.base.protocol + '//' + hyperlink.path)
                 if (!this.visited[hyperlink.path]) {
                     this.handlePush(hyperlink.path)
                     return
                 }
+            }
+
+            // THIS IS FOR PATHNAMES WHICH DO NOT MATCH ON THE CRITERIA SO WE CAN QUEUE OTHER PAGES
+            if (
+                hyperlink.host !== null && 
+                this.removeWWW(hyperlink.host + hyperlink.path).startsWith(this.removeWWW(this.base.host)) &&
+                !this.visited[hyperlink.path]
+            ) {
+                this.queue(this.base.protocol + '//' + this.base.host + hyperlink.path)
+                this.visited[hyperlink.path] = true
+                return
+            }
+
+            if (
+                this.removeWWW(this.hyperlinkPathTrailingSlash(hyperlink)).startsWith(this.removeWWW(this.base.host))
+            ) {
+                hyperlink = URL.parse(this.base.protocol + '//' + hyperlink.path)
+                if (!this.visited[hyperlink.path]) {
+                    this.queue(this.base.protocol + '//' + this.base.host + hyperlink.path)
+                    this.visited[hyperlink.path] = true
+                    return
+                }
+                
             }
 
             if (hyperlink.path.split('/')[0].indexOf('.') !== -1) {
