@@ -30,11 +30,17 @@ class Screenshot extends Writable {
         stream.write(chunk)
         stream.end();
 
+
+        // TODO IMPLEMENT THE SAME QUEUE FROM site-crawler We dont wont 100s of instances of phantomjs running at the same time
+
         this.screenshotChunk(filename)
             .then((chunkFilename: string) => this.removeChunk(chunkFilename))
-            .then(() => {this.index++})
-            .then(() => callback())
+
+        this.index++;
+        callback()
     }
+
+
 
     removeChunk(chunkFilename: string): Promise<any> {
         return unlinkAsync(chunkFilename)
