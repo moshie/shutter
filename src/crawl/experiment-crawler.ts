@@ -3,55 +3,77 @@ import * as URL from 'url'
 import * as queue from 'queue'
 import * as trumpet from 'trumpet'
 import * as request from 'request'
+import HyperlinkParser from './hyperlink-parser'
 
 class Crawler extends Readable {
-    queue: queue
-    baseUrl: string
+
+    /**
+     * Hyperlink parser
+     * @type {HyperlinkParser}
+     */
     parser: HyperlinkParser
+
+    /**
+     * Queue factory
+     * @param {queue}
+     */
+    queue: queue
+
+    /**
+     * Base url
+     * @type {string}
+     */
+    baseUrl: string
+
+    /**
+     * Request user agent
+     * @type {string}
+     */
     userAgent: string = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
 
+    /**
+     * Crawler constructor
+     * 
+     * @param {string} baseUrl
+     */
     constructor(baseUrl: string) {
-        super({ objectmode: true })
-        this.queue = queue({ concurrency: 20 })
+        super({ objectMode: true })
         this.baseUrl = baseUrl
-        this.parser = new HyperlinkParser(this)
+        this.queue = queue({ concurrency: 20, autostart: true })
     }
 
+    /**
+     * Readable stream implementation
+     * 
+     * @param {number} size
+     */
     _read(size: number) {
-        this.queue.push((next) => this.crawl(this.baseUrl, next))
+        this.crawl(this.baseUrl)
     }
 
-    crawl(url: string, next: () => void) {
+    /**
+     * Crawl a url
+     * 
+     * @param {string} url
+     * @param {function} next
+     */
+    crawl(url: string, next: () => void = () => {}) {
+        if (!(this.parser instanceof HyperlinkParser)) {
+            this.parser = new HyperlinkParser(this)
+        }
+
+        if (this.parser.visited[url]) return;
+
+        this.parser.visited[url] = true;
+
         let tr = trumpet()
         tr = this.parser.parse(tr)
 
-        request({ url, headers: { 'User-Agent': this.userAgent } }).pipe(trumpet)
+        request({ url, headers: { 'User-Agent': this.userAgent } }).pipe(tr)
 
-        trumpet.on('end', () => next())
+        tr.on('end', () => next())
     }
 
 }
 
-class HyperlinkParser {
-
-    crawler: Crawler
-
-    constructor(crawler) {
-        this.crawler = crawler
-    }
-
-    parse(trumpet: any) {
-        return trumpet.selectAll('a[href]', (element) => {
-            element.getAttribute('href', (value) => {
-                this.crawler.push(chunk)
-                this.crawler.queue.push((next) => this.crawler.crawl(/* PATH TO BE CRAWLED NEXT */, next))
-            })
-        })
-    }
-}
-
-
-// Implementation
-// const crawler = new Crawler('http://colprint.co.uk')
-
-// crawler.pipe(screenshot)
+export default Crawler

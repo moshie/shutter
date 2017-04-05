@@ -20,6 +20,16 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
 
 	crawler.pipe(screenshot)
 
+	// crawler.on('data', (data) => {
+	// 	console.log(data)
+	// })
+
+
+	// Implementation
+	// const crawler = new Crawler('http://colprint.co.uk')
+
+	// crawler.pipe(screenshot)
+
 
 	// TODO: Works However could benefit from speed improvement
 	// 

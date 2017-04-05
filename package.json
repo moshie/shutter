@@ -48,6 +48,7 @@
     "node-spider": "^1.4.1",
     "ora": "^1.2.0",
     "phantomjs-prebuilt": "^2.1.14",
+    "queue": "^4.2.1",
     "request": "^2.81.0",
     "trumpet": "^1.7.2",
     "typescript": "^2.2.1"
