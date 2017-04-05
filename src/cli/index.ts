@@ -10,26 +10,37 @@ import {environmentsInterface} from './environments-interface'
 import directoriesExistIn from '../utilities/directories-exist-in'
 
 import Screenshot from '../screenshot/site-screenshot'
-import Crawler from '../crawl/site-crawler'
+import Crawler from '../crawl/experiment-crawler'
 
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): any {
-	const environments: environmentsInterface = sanitize(rawEnvironments)
-	const crawler = new Crawler(environments[Object.keys(environments)[0]], { concurrent: 20 })
-	//const screenshot = new Screenshot(environments, options.directory)
-	const screenshot = new Screenshot(environments, options.directory)
 
-	crawler.pipe(screenshot)
-
-	// crawler.on('data', (data) => {
-	// 	console.log(data)
-	// })
+	//TODO: This needs optimizing too much blocking code seperate each validation check out to its own async
+	const environments: environmentsInterface = sanitize(rawEnvironments) 
 
 
-	// Implementation
-	// const crawler = new Crawler('http://colprint.co.uk')
+	const crawler = new Crawler(environments[Object.keys(environments)[0]])
+	const chunk = new Chunker(10);
+	const file = new JSONFile(options.directory)
+	const capture = new Screenshot(environments, options.directory)
 
-	// crawler.pipe(screenshot)
+	// URL -> BUFFER -> FILE -> SCREENSHOT
 
+	// http://colprint.co.uk/pathname -> 
+	// [http://colprint.co.uk/pathname, http://colprint.co.uk/pathtwo]
+	// CHUNK GETS PUT IN A FILE passes file name on
+	// phantomjs captures the chunk
+
+	crawler // READABLE
+		.pipe(chunk) // TRANSFORM | http://stackoverflow.com/questions/38482445/how-to-chunk-a-stream-of-objects
+		.pipe(file) // TRANSFORM
+		.pipe(capture) // WRITABLE
+
+	
+	// If its a file
+	fs.createReadStream('paths.json')
+		.pipe(chunker)
+		.pipe(file)
+		.pipe(capture)
 
 	// TODO: Works However could benefit from speed improvement
 	// 
