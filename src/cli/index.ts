@@ -9,38 +9,37 @@ import {optionsInterface} from './options-interface'
 import {environmentsInterface} from './environments-interface'
 import directoriesExistIn from '../utilities/directories-exist-in'
 
-import Screenshot from '../screenshot/site-screenshot'
-import Crawler from '../crawl/experiment-crawler'
+// import Screenshot from '../screenshot/site-screenshot'
+// import Crawler from '../crawl/experiment-crawler'
+
+import Crawler from '../crawler/crawler'
+import Collector from '../collector/collector'
+import Files from '../files/files'
 
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): any {
 
 	//TODO: This needs optimizing too much blocking code seperate each validation check out to its own async
 	const environments: environmentsInterface = sanitize(rawEnvironments) 
 
+	//const capture = new Screenshot(environments, options.directory)
 
 	const crawler = new Crawler(environments[Object.keys(environments)[0]])
-	const chunk = new Chunker(10);
-	const file = new JSONFile(options.directory)
-	const capture = new Screenshot(environments, options.directory)
+	const collector = new Collector(10)
+	const file = new Files(options.directory)
 
 	// URL -> BUFFER -> FILE -> SCREENSHOT
 
-	// http://colprint.co.uk/pathname -> 
-	// [http://colprint.co.uk/pathname, http://colprint.co.uk/pathtwo]
-	// CHUNK GETS PUT IN A FILE passes file name on
-	// phantomjs captures the chunk
-
 	crawler // READABLE
-		.pipe(chunk) // TRANSFORM | http://stackoverflow.com/questions/38482445/how-to-chunk-a-stream-of-objects
-		.pipe(file) // TRANSFORM
-		.pipe(capture) // WRITABLE
+		.pipe(collector)
+		.pipe(file)
+		//.pipe(capture) // WRITABLE
 
 	
-	// If its a file
-	fs.createReadStream('paths.json')
-		.pipe(chunker)
-		.pipe(file)
-		.pipe(capture)
+	// If its a json file
+	// fs.createReadStream('paths.json')
+	// 	.pipe(chunker)
+	// 	.pipe(file)
+	// 	.pipe(capture)
 
 	// TODO: Works However could benefit from speed improvement
 	// 
