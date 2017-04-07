@@ -1,9 +1,8 @@
+import * as EventEmitter from 'events'
 import Crawler from './experiment-crawler'
 import * as URL from 'url'
 
-class HyperlinkParser {
-
-    crawler: Crawler
+class HyperlinkParser extends EventEmitter {
 
     base: URL.Url
 
@@ -23,12 +22,13 @@ class HyperlinkParser {
         'shtml'
     ]
 
-    constructor(crawler: Crawler) {
-        this.crawler = crawler
-        this.base = URL.parse(crawler.baseUrl)
+    constructor(baseUrl) {
+        this.base = URL.parse(baseUrl)
     }
 
-    parse(trumpet: any) {
+    parse() {
+        var trumpet = trumpet()
+
         trumpet.selectAll('a[href]', (element) => {
             element.getAttribute('href', (value) => {
 

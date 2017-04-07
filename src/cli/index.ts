@@ -31,7 +31,10 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
 
 	crawler // READABLE
 		.pipe(collector)
-		.pipe(file)
+		.on('data', (data) => {
+			console.log(data);
+		})
+		//.pipe(file)
 		//.pipe(capture) // WRITABLE
 
 	

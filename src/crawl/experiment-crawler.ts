@@ -3,6 +3,7 @@ import * as URL from 'url'
 import * as queue from 'queue'
 import * as trumpet from 'trumpet'
 import * as request from 'request'
+import HyperlinkParser from './hyperlink-parser'
 
 class Crawler extends Readable {
 
@@ -36,6 +37,8 @@ class Crawler extends Readable {
      */
     visited: any = {}
 
+    parser: HyperlinkParser
+
     /**
      * Crawler constructor
      * 
@@ -44,8 +47,8 @@ class Crawler extends Readable {
     constructor(baseUrl: string) {
         super({ objectMode: true })
         this.baseUrl = baseUrl
-        this.base = URL.parse(baseUrl)
         this.queue = queue({ concurrency: 20, autostart: true })
+        this.parser = new HyperlinkParser(baseUrl)
     }
 
     /**
@@ -54,7 +57,7 @@ class Crawler extends Readable {
      * @param {number} size
      */
     _read(size: number) {
-        this.crawl(this.baseUrl)
+        this.queue.push((next) => this.crawl(this.baseUrl, next))
     }
 
     /**
@@ -64,20 +67,15 @@ class Crawler extends Readable {
      * @param {function} next
      */
     crawl(url: string, next: () => void = () => {}) {
-        if (this.visited[url]) return;
 
-        this.visited[url] = true;
+        var tr = this.parser.parse(url)
 
-        let tr = trumpet()
+        this.parser.on('next', (_url) => {
+            this.queue.push((next) => this.crawl(_url, next))
+        })
 
-        tr.selectAll('a[href]', (element) => {
-            element.getAttribute('href', (value) => {
-
-                // NO IDEA HOW TO BEST VALIDATE HYPERLINKS
-
-                // CHUNK UP THE DATA ON THE SCREENSHOTTER??
-
-            })
+        this.parser.on('data', (_url) => {
+            this.push(_url)
         })
 
         request({ url, headers: { 'User-Agent': this.userAgent } }).pipe(tr)
