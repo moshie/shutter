@@ -21,7 +21,7 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
 	//TODO: This needs optimizing too much blocking code seperate each validation check out to its own async
 	const environments: environmentsInterface = sanitize(rawEnvironments) 
 
-	//const capture = new Screenshot(environments, options.directory)
+	// const capture = new Screenshot(environments, options.directory)
 
 	const crawler = new Crawler(environments[Object.keys(environments)[0]])
 	const collector = new Collector(10)
@@ -31,18 +31,8 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
 
 	crawler // READABLE
 		.pipe(collector)
-		.on('data', (data) => {
-			console.log(data);
-		})
-		//.pipe(file)
+		.pipe(file)
 		//.pipe(capture) // WRITABLE
-
-	
-	// If its a json file
-	// fs.createReadStream('paths.json')
-	// 	.pipe(chunker)
-	// 	.pipe(file)
-	// 	.pipe(capture)
 
 	// TODO: Works However could benefit from speed improvement
 	// 

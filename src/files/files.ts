@@ -32,7 +32,7 @@ class Files extends Transform {
 	 * 
 	 * @param {Buffer|string|any} 	chunk
 	 * @param {string} 				encoding
-	 * @param {() => void} 			done
+	 * @param {Function} 			done
 	 */
 	_transform(chunk: Buffer | string | any, encoding: string, done: () => void): void {
 		let filename: string = `chunk-${this.index}.json`

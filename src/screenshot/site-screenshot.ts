@@ -18,18 +18,13 @@ class Screenshot extends Writable {
     capturer: CapturerInterface
 
     constructor(environments: environmentsInterface, base: string  = process.cwd(), options = {}) {
-        super({})
+        super({ objectMode: true })
         this.environments = environments
         this.capturer = new Phantom(environments)
         this.base = base
     }
 
-    _write(chunk, encoding, callback) {
-        let filename: string = path.resolve(this.base, `chunk-${this.index}.json`);
-        var stream = fs.createWriteStream(filename)
-        stream.write(chunk)
-        stream.end();
-
+    _write(filename, encoding, callback) {
 
         // TODO IMPLEMENT THE SAME QUEUE FROM site-crawler We dont wont 100s of instances of phantomjs running at the same time
 

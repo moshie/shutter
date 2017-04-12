@@ -33,20 +33,23 @@ class Collector extends Transform {
      */
     _transform(chunk: Buffer | string | any, encoding: string, done: () => void): void {
         if (this.collection.length == this.size) {
-            this.push(this.collection);
-            this.collection = [];
+            this.push(this.collection)
+            this.collection = []
         }
 
-        this.collection.push(chunk);
+        this.collection.push(chunk)
 
-        done();
+        done()
     }
 
     /**
      * Flush remaining items in collection
+     * 
+     * @param {Function} done
      */
-    _flush(): void {
+    _flush(done): void {
         this.push(this.collection)
+        done()
     }
 
 }
