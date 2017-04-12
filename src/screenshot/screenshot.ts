@@ -2,13 +2,11 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as Promise from 'bluebird'
-
+import * as queue from 'queue'
 import { Writable } from 'stream'
-
+import * as Promise from 'bluebird'
 const unlinkAsync: any = Promise.promisify(fs.unlink)
 
-import * as queue from 'queue'
 import Phantom from './phantom'
 import CapturerInterface from './capturer-interface'
 import { environmentsInterface } from '../cli/environments-interface'
@@ -22,12 +20,6 @@ class Screenshot extends Writable {
     environments: environmentsInterface
 
     /**
-     * Filepath base
-     * @type {string}
-     */
-    base: string
-
-    /**
      * Queue system
      * @type {queue}
      */
@@ -39,17 +31,28 @@ class Screenshot extends Writable {
      */
     capturer: CapturerInterface
 
-    constructor(environments: environmentsInterface, base: string  = process.cwd(), options = {}) {
+    /**
+     * Screenshot capture constructor
+     * 
+     * @param environments 
+     * @param base 
+     * @param options 
+     */
+    constructor(environments: environmentsInterface) {
         super({ objectMode: true })
         this.environments = environments
         this.capturer = new Phantom(environments)
-        this.base = base
-        this.queue = queue({ concurrency: 3, autostart: true })
+        this.queue = queue({ concurrency: 5, autostart: true })
     }
 
-    _write(filename, encoding, callback) {
-
-        console.log(filename);
+    /**
+     * Screenshot write stream implemention
+     * 
+     * @param {string} filename 
+     * @param {null|string} encoding 
+     * @param {Function} callback 
+     */
+    _write(filename: string, encoding: null|string, callback: () => void) {
 
         this.queue.push((next) => {
             this.screenshotChunk(filename)
@@ -60,22 +63,33 @@ class Screenshot extends Writable {
         callback()
     }
 
-    removeChunk(chunkFilename: string): Promise<any> {
-        return unlinkAsync(chunkFilename)
+    /**
+     * Remove file
+     * 
+     * @param {string} filename 
+     */
+    removeChunk(filename: string): Promise<any> {
+        return unlinkAsync(filename)
     }
 
-    screenshotChunk(chunkFilename: string): Promise<string> {
+    /**
+     * Screenshot each environment chunk
+     * 
+     * @param {string} filename
+     */
+    screenshotChunk(filename: string): Promise<string> {
         let chunkQueue: Promise<any>[] = []
         let environments: string[] = Object.keys(this.environments)
 
         for (var i = environments.length - 1; i >= 0; i--) {
             chunkQueue.push(
-                this.capturer.capture(chunkFilename, environments[i])
+                this.capturer.capture(filename, environments[i])
             )
         }
 
-        return Promise.join(...chunkQueue).then(() => chunkFilename)
+        return Promise.join(...chunkQueue).then(() => filename)
     }
+
 }
 
 export default Screenshot
