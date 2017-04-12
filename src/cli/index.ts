@@ -5,8 +5,8 @@ import * as Promise from 'bluebird'
 import sanitize from './sanitizer'
 
 import Compare from '../compare/compare'
-import {optionsInterface} from './options-interface'
-import {environmentsInterface} from './environments-interface'
+import { optionsInterface } from './options-interface'
+import { environmentsInterface } from './environments-interface'
 import directoriesExistIn from '../utilities/directories-exist-in'
 
 // import Screenshot from '../screenshot/site-screenshot'
@@ -15,6 +15,7 @@ import directoriesExistIn from '../utilities/directories-exist-in'
 import Crawler from '../crawler/crawler'
 import Collector from '../collector/collector'
 import Files from '../files/files'
+import Screenshot from '../screenshot/screenshot'
 
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): any {
 
@@ -26,13 +27,12 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
 	const crawler = new Crawler(environments[Object.keys(environments)[0]])
 	const collector = new Collector(10)
 	const file = new Files(options.directory)
+	const capture = new Screenshot(environments, options.directory)
 
-	// URL -> BUFFER -> FILE -> SCREENSHOT
-
-	crawler // READABLE
+	crawler
 		.pipe(collector)
 		.pipe(file)
-		//.pipe(capture) // WRITABLE
+		.pipe(capture)
 
 	// TODO: Works However could benefit from speed improvement
 	// 
