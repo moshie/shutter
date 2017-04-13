@@ -16,6 +16,12 @@ export default class Phantom implements CapturerInterface {
     environments: environmentsInterface
 
     /**
+	 * Directory to put files
+	 * @type {string}
+	 */
+	directory: string
+
+    /**
      * Paths successfully captured
      * @type {string[]}
      */
@@ -38,8 +44,9 @@ export default class Phantom implements CapturerInterface {
      * 
      * @param {environmentsInterface} environments
      */
-    constructor(environments: environmentsInterface) {
+    constructor(environments: environmentsInterface, directory: string = process.cwd()) {
         this.environments = environments;
+        this.directory = directory;
     }
 
     /**
@@ -53,7 +60,7 @@ export default class Phantom implements CapturerInterface {
         var domain: string = this.environments[environment]
 
         return new Promise((resolve, reject): void => {
-            const phantom = shell(Phantom.executable, [Phantom.script, chunkFilename, domain, environment])
+            const phantom = shell(Phantom.executable, [Phantom.script, chunkFilename, domain, environment], {cwd: this.directory})
 
             phantom.stdout.on('data', (data: NodeBuffer) => {
                 var out: string = data.toString('utf8')

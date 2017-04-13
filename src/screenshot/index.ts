@@ -51,7 +51,7 @@ class Screenshot {
         const source: Crawler|FileReader = this.getSource()
         const collector: Collector = new Collector(this.options.chunkSize)
         const divider: FileDivider = new FileDivider(this.options.directory)
-        const capture: Capture = new Capture(this.environments, this.options.concurrency) //TODO: change to a duplex stream 4 Comparison
+        const capture: Capture = new Capture(this.environments, this.options.directory, this.options.concurrency) //TODO: change to a duplex stream 4 Comparison
 
         return source.pipe(collector).pipe(divider).pipe(capture)
     }

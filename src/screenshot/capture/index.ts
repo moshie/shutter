@@ -37,10 +37,11 @@ class Capture extends Writable {
      * @param base 
      * @param options 
      */
-    constructor(environments: environmentsInterface, concurrency: number = 10) {
+    constructor(environments: environmentsInterface, directory: string = process.cwd(), concurrency: number = 10) {
         super({ objectMode: true })
         this.environments = environments
-        this.capturer = new Phantom(environments)
+        directory = directory[0] === '~' ? path.join(process.env.HOME, directory.slice(1)) : directory;
+        this.capturer = new Phantom(environments, directory)
         this.queue = queue({ concurrency, autostart: true })
     }
 
