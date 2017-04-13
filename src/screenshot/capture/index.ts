@@ -37,11 +37,11 @@ class Capture extends Writable {
      * @param base 
      * @param options 
      */
-    constructor(environments: environmentsInterface) {
+    constructor(environments: environmentsInterface, concurrency: number = 10) {
         super({ objectMode: true })
         this.environments = environments
         this.capturer = new Phantom(environments)
-        this.queue = queue({ concurrency: 5, autostart: true })
+        this.queue = queue({ concurrency, autostart: true })
     }
 
     /**
