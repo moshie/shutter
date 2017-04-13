@@ -27,12 +27,12 @@ class Collector extends Transform {
     /**
      * Transformation stream implementation
      * 
-     * @param {Buffer|string|any}  chunk
-     * @param {string}             encoding
-     * @param {() => void}         done
+     * @param {Buffer|string|any}   chunk
+     * @param {string}              encoding
+     * @param {Function}            done
      */
     _transform(chunk: Buffer | string | any, encoding: string, done: () => void): void {
-        if (this.collection.length == this.size) {
+        if (this.collection.length === this.size) {
             this.push(this.collection)
             this.collection = []
         }

@@ -1,5 +1,5 @@
 import validation from './validation'
-import {environmentsInterface} from './environments-interface'
+import { environmentsInterface } from '../screenshot/interfaces'
 
 function sanitize(rawEnvironments: string[]) {
 

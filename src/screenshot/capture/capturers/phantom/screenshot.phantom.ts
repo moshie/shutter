@@ -2,7 +2,7 @@
 const system = require('system');
 const fs = require('fs');
 
-const isJson = require('../../utilities/is-json').default;
+const isJson = require('../../../../utilities/is-json').default;
 const sanitizePath = require('./sanitize-path').default;
 
 console.error = (error: string) => {

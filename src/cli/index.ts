@@ -7,17 +7,9 @@ import sanitize from './sanitizer'
 import Compare from '../compare/compare'
 import directoriesExistIn from '../utilities/directories-exist-in'
 
-import { optionsInterface } from './options-interface'
-import { environmentsInterface } from './environments-interface'
+import { optionsInterface, environmentsInterface } from '../screenshot/interfaces'
 
-
-
-
-
-import Crawler from '../crawler/crawler'
-import Collector from '../collector/collector'
-import Files from '../files/files'
-import Screenshot from '../screenshot/screenshot'
+import Screenshot from '../screenshot'
 
 /**
  * Handle CLI Screenshots
@@ -27,15 +19,11 @@ import Screenshot from '../screenshot/screenshot'
  */
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): any {
 
-    //TODO: This needs optimizing too much blocking code seperate each validation check out to its own async
     const environments: environmentsInterface = sanitize(rawEnvironments)
 
-    const crawler: Crawler = new Crawler(environments[Object.keys(environments)[0]])
-    const collector: Collector = new Collector(10)
-    const file: Files = new Files(options.directory)
-    const capture: Screenshot = new Screenshot(environments) // TODO: Convert to duplex stream 4 Comparison
+    const screenshot: Screenshot = new Screenshot(environments, options)
 
-    return crawler.pipe(collector).pipe(file).pipe(capture)
+    return screenshot.capture()
 
 }
 

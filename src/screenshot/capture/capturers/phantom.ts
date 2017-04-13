@@ -4,9 +4,8 @@ import * as path from 'path'
 import * as Promise from 'bluebird'
 import {spawn as shell} from 'child_process'
 
-import isJson from '../utilities/is-json'
-import CapturerInterface from './capturer-interface'
-import {environmentsInterface} from '../cli/environments-interface'
+import isJson from '../../../utilities/is-json'
+import {CapturerInterface, environmentsInterface} from '../../interfaces'
 
 export default class Phantom implements CapturerInterface {
 
@@ -26,7 +25,7 @@ export default class Phantom implements CapturerInterface {
      * Path to the phantomjs executable
      * @param static {string} executable
      */
-    static executable: string = path.resolve(__dirname, '..', '..', 'node_modules', '.bin', 'phantomjs')
+    static executable: string = path.resolve(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'phantomjs')
 
     /**
      * Path to the phantomjs script 

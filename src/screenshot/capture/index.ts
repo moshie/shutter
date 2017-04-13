@@ -7,11 +7,10 @@ import { Writable } from 'stream'
 import * as Promise from 'bluebird'
 const unlinkAsync: any = Promise.promisify(fs.unlink)
 
-import Phantom from './phantom'
-import CapturerInterface from './capturer-interface'
-import { environmentsInterface } from '../cli/environments-interface'
+import Phantom from './capturers/phantom'
+import { CapturerInterface, environmentsInterface } from '../interfaces'
 
-class Screenshot extends Writable {
+class Capture extends Writable {
     
     /**
      * Specifed environments
@@ -92,4 +91,4 @@ class Screenshot extends Writable {
 
 }
 
-export default Screenshot
+export default Capture

@@ -2,7 +2,7 @@
 
 import * as URL from 'url'
 
-import { visitedInterface, parsedInterface } from './interfaces'
+import { visitedInterface, parsedInterface } from '../interfaces'
 
 class HyperlinkParser {
     

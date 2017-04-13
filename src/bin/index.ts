@@ -2,7 +2,7 @@
 import * as program from 'commander'
 
 const version = require('../../package').version
-import {handleScreenshots, handleCompare} from '../cli'
+import { handleScreenshots, handleCompare } from '../cli'
 
 program.version(version)
 
@@ -12,8 +12,10 @@ program.version(version)
 program
     .command('screenshots [environments...]')
     .description('Capture screenshots of web pages')
-    .option('-d, --directory <directory>')
-    .option('-p --paths <paths>')
+    .option('-d, --directory <directory>', 'directory to run in')
+    .option('-p, --paths <paths>', 'Pass a file of custom paths')
+    .option('-s, --chunkSize <chunkSize>', 'Size of each chunk', parseInt)
+    .option('-c, --concurrency <concurrency>', 'How many Phantom js instances to run', parseInt)
     .action(handleScreenshots)
 
 /**

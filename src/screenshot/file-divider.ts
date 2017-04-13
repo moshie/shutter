@@ -3,7 +3,7 @@ import { Transform } from 'stream'
 import * as fs from 'fs'
 import * as path from 'path'
 
-class Files extends Transform {
+class FileDivider extends Transform {
 
 	/**
 	 * Directory to put files
@@ -48,4 +48,4 @@ class Files extends Transform {
 
 }
 
-export default Files
+export default FileDivider

@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "outDir": "../../../dist/screenshot/phantom",
+        "outDir": "../../../../../dist/screenshot/capture/capturers/phantom",
         "module": "commonjs",
         "declaration": true,
         "noImplicitAny": false,
