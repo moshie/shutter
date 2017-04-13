@@ -44,6 +44,8 @@ class Screenshot {
 
     /**
      * Capture screenshots
+     * 
+     * @return {Writable} capture Continue streaming chain
      */
     capture(): Writable {
         const source: Crawler|FileReader = this.getSource()
