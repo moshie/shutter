@@ -47,7 +47,6 @@
     "commander": "^2.9.0",
     "js-yaml": "^3.8.3",
     "lodash": "^4.17.4",
-    "node-spider": "^1.4.1",
     "ora": "^1.2.0",
     "phantomjs-prebuilt": "^2.1.14",
     "queue": "^4.2.1",

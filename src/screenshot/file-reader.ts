@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as yaml from 'js-yaml'
 import { Readable } from 'stream'
-import { indexOf } from 'lodash/indexOf'
+import * as indexOf from 'lodash/indexOf'
 
 class FileReader extends Readable {
 

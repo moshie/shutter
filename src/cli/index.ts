@@ -24,7 +24,6 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
     const screenshot: Screenshot = new Screenshot(environments, options)
 
     return screenshot.capture()
-
 }
 
 /**
