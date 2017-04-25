@@ -48,6 +48,8 @@ if (!Array.isArray(URLS)) {
     console.error('paths content must be a type of [Object array]')
 }
 
+var filepaths = [];
+
 var SCREENSHOT_WIDTH = 1280; 
 var SCREENSHOT_HEIGHT = 900; 
 var LOAD_WAIT_TIME = 1000;
@@ -78,11 +80,14 @@ var renderPage = function(page){
     };
 
     var id = sanitizePath(URLS[index]);
-    page.render(`${fs.workingDirectory}/${environment}/${id}_${SCREENSHOT_WIDTH}x${pageHeight}.png`);
+    var filename = `${fs.workingDirectory}/${environment}/${id}_${SCREENSHOT_WIDTH}x${pageHeight}.png`
+    filepaths.push(filename);
+    page.render(filename);
 }
 
 var exitIfLast = function(index,array){
     if (index == array.length-1){
+        console.log(JSON.stringify(filepaths))
         phantom.exit();
     }
 }

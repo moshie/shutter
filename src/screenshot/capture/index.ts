@@ -3,14 +3,14 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as queue from 'queue'
-import { Writable } from 'stream'
+import { Duplex } from 'stream'
 import * as Promise from 'bluebird'
 const unlinkAsync: any = Promise.promisify(fs.unlink)
 
 import Phantom from './capturers/phantom'
 import { CapturerInterface, environmentsInterface } from '../interfaces'
 
-class Capture extends Writable {
+class Capture extends Duplex {
     
     /**
      * Specifed environments
@@ -38,7 +38,7 @@ class Capture extends Writable {
      * @param options 
      */
     constructor(environments: environmentsInterface, directory: string = process.cwd(), concurrency: number = 10) {
-        super({ objectMode: true })
+        super({ writableObjectMode: true, readableObjectMode: true })
         this.environments = environments
         directory = directory[0] === '~' ? path.join(process.env.HOME, directory.slice(1)) : directory;
         this.capturer = new Phantom(environments, directory)
@@ -56,11 +56,20 @@ class Capture extends Writable {
 
         this.queue.push((next) => {
             this.screenshotChunk(filename)
-                .then((chunkFilename: string) => this.removeChunk(chunkFilename))
-                .then(() => next())
+                .then((paths: any) => {
+                    this.removeChunk(filename)
+                    return paths;
+                })
+                .then((paths) => next(false, paths))
         })
 
         callback()
+    }
+
+    _read(size: number) {
+        this.queue.on('success', (result, job) => {
+            this.push(result) // Result is passed as the second argument of next we need the file paths to be passed here
+        })
     }
 
     /**
@@ -77,7 +86,7 @@ class Capture extends Writable {
      * 
      * @param {string} filename
      */
-    screenshotChunk(filename: string): Promise<string> {
+    screenshotChunk(filename: string): Promise<any> {
         let chunkQueue: Promise<any>[] = []
         let environments: string[] = Object.keys(this.environments)
 
@@ -87,7 +96,27 @@ class Capture extends Writable {
             )
         }
 
-        return Promise.join(...chunkQueue).then(() => filename)
+        return Promise.join(...chunkQueue).then((screenshotPaths) => this.formatPaths(screenshotPaths))
+    }
+
+    /**
+     * Format the paths into a readable format
+     * 
+     * @param screenshotPaths
+     */
+    formatPaths(screenshotPaths: string[][]): any {
+
+        var formatted = {};
+
+        screenshotPaths.forEach((chunk, index) => {
+
+            let environmentName = Object.keys(this.environments)[index]
+
+            formatted[environmentName] = screenshotPaths[index];
+            
+        })
+
+        return formatted;
     }
 
 }

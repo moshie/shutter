@@ -1,8 +1,8 @@
 "use strict"
 
-import * as isString from 'lodash/isString'
+import { Duplex } from 'stream'
 import { defaults } from 'lodash/object'
-import { Writable } from 'stream'
+import * as isString from 'lodash/isString'
 
 import Crawler from './crawler'
 import Capture from './capture'
@@ -45,13 +45,13 @@ class Screenshot {
     /**
      * Capture screenshots
      * 
-     * @return {Writable} capture Continue streaming chain
+     * @return {Duplex} capture Continue streaming chain
      */
-    capture(): Writable {
+    capture(): Duplex {
         const source: Crawler|FileReader = this.getSource()
         const collector: Collector = new Collector(this.options.chunkSize)
         const divider: FileDivider = new FileDivider(this.options.directory)
-        const capture: Capture = new Capture(this.environments, this.options.directory, this.options.concurrency) //TODO: change to a duplex stream 4 Comparison
+        const capture: Capture = new Capture(this.environments, this.options.directory, this.options.concurrency)
 
         return source.pipe(collector).pipe(divider).pipe(capture)
     }
