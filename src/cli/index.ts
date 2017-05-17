@@ -4,14 +4,16 @@ import * as Promise from 'bluebird'
 
 import sanitize from './sanitizer'
 
-//import Compare from '../compare'
-import directoriesExistIn from '../utilities/directories-exist-in'
+import Compare from '../compare'
+import isDirectory from '../utilities/is-directory'
 
 import { Duplex } from 'stream'
 
 import { optionsInterface, environmentsInterface } from '../screenshot/interfaces'
 
 import Screenshot from '../screenshot'
+
+
 
 /**
  * Handle CLI Screenshots
@@ -37,6 +39,37 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
  */
 export function handleCompare(original: string, comparison: string, options: optionsInterface): any {
 
+    const compare: Compare = new Compare(options.directory);
+
+    if (isDirectory(options.directory, original, comparison)) {
+        console.log('all are directories');
+        return;
+    }
+
+    console.log('all are urls');
+
+    return;
+
+
+
+
+
+    // if original & comparison are URLS
+
+        // Split into environments
+        //const environments: string[] = [`original=${original}`, `comparison=${comparison}`];
+        // Capture Site screenshots then pipe into the comparison tool
+        //return handleScreenshots(environments, options).pipe(compare)
+
+    // ELSE
+
+        // Create a Readable stream which can pass the directory files
+        // Compare files from original & comparison directories
+
+
+        //const fs.createReadableStream()
+
+
 
     // {
     //     original: ['/path/'],
@@ -44,15 +77,13 @@ export function handleCompare(original: string, comparison: string, options: opt
     //     develop: ['/']
     // }
 
-    const compare: Compare = new Compare(options.directory);
+    
 
-    compare.compare({
-        original: '/path/to/original.png', // Can be an array / string
-        comparison: '/path/to/comparison.png'
-    }); -> API
+    // compare.compare({
+    //     original: '/path/to/original.png', // Can be an array / string
+    //     comparison: '/path/to/comparison.png'
+    // }); -> API
 
-    let environments: string[] = [`original=${original}`, `comparison=${comparison}`]
-    return handleScreenshots(environments, options)
 
     // original = path or url
 

@@ -18,12 +18,6 @@ class Crawler extends Readable {
     base: string
 
     /**
-     * Parsed base url
-     * @type {URL.Url}
-     */
-    baseUrl: URL.Url
-
-    /**
      * Queue system
      * @type {queue}
      */
@@ -49,9 +43,8 @@ class Crawler extends Readable {
     constructor(base: string) {
         super({ objectMode: true })
         this.base = base;
-        this.baseUrl = URL.parse(base)
         this.queue = queue({ concurrency: 10, autostart: true }).on('end', () => this.push(null))
-        this.parser = new HyperlinkParser(this.baseUrl)
+        this.parser = new HyperlinkParser(URL.parse(base))
     }
 
     /**

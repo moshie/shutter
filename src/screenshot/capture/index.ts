@@ -61,6 +61,9 @@ class Capture extends Duplex {
                     return paths;
                 })
                 .then((paths) => next(false, paths))
+                .catch((error) => {
+                    console.error(error);
+                })
         })
 
         callback()
