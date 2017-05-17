@@ -13,7 +13,7 @@ import { optionsInterface, environmentsInterface } from '../screenshot/interface
 
 import Screenshot from '../screenshot'
 
-
+import DualFileReader from '../compare/dual-file-reader'
 
 /**
  * Handle CLI Screenshots
@@ -39,16 +39,28 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
  */
 export function handleCompare(original: string, comparison: string, options: optionsInterface): any {
 
-    const compare: Compare = new Compare(options.directory);
+    const compare: Compare = new Compare(options.directory)
+
+    // compare.compare({
+    //     original: '/path/to/original.png', // Can be an array / string
+    //     comparison: '/path/to/comparison.png'
+    // }); -> API
 
     if (isDirectory(options.directory, original, comparison)) {
-        console.log('all are directories');
-        return;
+        // Readable stream
+        const source = new DualFileReader(original, comparison, options)
+        source.on('data', (data) => {
+        // {
+        //     original: ['/path/'],
+        //     comparison: ['/path/']
+        // }
+            console.log(data)
+        })
+        return
     }
 
-    console.log('all are urls');
-
-    return;
+    const environments: string[] = [`original=${original}`, `comparison=${comparison}`]
+    return handleScreenshots(environments, options).pipe(compare)
 
 
 
@@ -71,18 +83,11 @@ export function handleCompare(original: string, comparison: string, options: opt
 
 
 
-    // {
-    //     original: ['/path/'],
-    //     comparison: ['/path/'],
-    //     develop: ['/']
-    // }
+
 
     
 
-    // compare.compare({
-    //     original: '/path/to/original.png', // Can be an array / string
-    //     comparison: '/path/to/comparison.png'
-    // }); -> API
+
 
 
     // original = path or url

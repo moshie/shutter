@@ -6,6 +6,7 @@ import * as isString from 'lodash/isString'
 
 import Crawler from './crawler'
 import Capture from './capture'
+import Combiner from './combiner'
 import Collector from './collector'
 import FileReader from './file-reader'
 import FileDivider from './file-divider'
@@ -52,8 +53,9 @@ class Screenshot {
         const collector: Collector = new Collector(this.options.chunkSize)
         const divider: FileDivider = new FileDivider(this.options.directory)
         const capture: Capture = new Capture(this.environments, this.options.directory, this.options.concurrency)
+        const combiner: Combiner = new Combiner()
 
-        return source.pipe(collector).pipe(divider).pipe(capture)
+        return source.pipe(collector).pipe(divider).pipe(capture).pipe(combiner)
     }
 
     /**
