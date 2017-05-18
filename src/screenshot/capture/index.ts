@@ -93,7 +93,7 @@ class Capture extends Duplex {
         let chunkQueue: Promise<any>[] = []
         let environments: string[] = Object.keys(this.environments)
 
-        for (var i = environments.length - 1; i >= 0; i--) {
+        for (let i = 0; i < environments.length; i++) {
             chunkQueue.push(
                 this.capturer.capture(filename, environments[i])
             )

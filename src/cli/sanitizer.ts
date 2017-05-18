@@ -12,7 +12,8 @@ function sanitize(rawEnvironments: string[]) {
 
     let sanitized: environmentsInterface = {};
 
-    for (var i = rawEnvironments.length - 1; i >= 0; i--) {
+    for (var i = 0; i < rawEnvironments.length; i++) {
+        // Must count up!
         let [environment, domain] = rawEnvironments[i].split('=')
         domain = /^(https?)/.test(domain) ? domain : `http://${domain}`
         domain = domain[domain.length-1] == '/' ? domain : `${domain}/`

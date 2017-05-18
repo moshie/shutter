@@ -3,23 +3,26 @@ import { Duplex } from 'stream'
 import * as queue from 'queue'
 import * as Promise from 'bluebird'
 
-import { comparisonInterface } from './interfaces'
+import { optionsInterface } from '../screenshot/interfaces'
 
 class Compare extends Duplex {
 
-    /**
-     * Queue system
-     * @type {queue}
-     */
-    queue: queue
-
-    constructor(directory: string = process.cwd(), concurrency: number = 10) {
-        super({ writableObjectMode: true, readableObjectMode: true })
-        directory = directory[0] === '~' ? path.join(process.env.HOME, directory.slice(1)) : directory;
-        this.queue = queue({ concurrency, autostart: true })
+    options: optionsInterface = {
+        directory: process.cwd(),
+        paths: undefined,
+        chunkSize: 10,
+        concurrency: 10
     }
 
-    _write(screenshots: comparisonInterface, encoding: null|string, callback: () => void) {
+    constructor(options: optionsInterface) {
+        super({ writableObjectMode: true, readableObjectMode: true })
+        //this.options = defaults(options, this.options)
+    }
+
+    _write(screenshots: any, encoding: null|string, callback: () => void) {
+
+        console.log(screenshots);
+
         // screenshots = \/
         // {
         //     original: ['/path/'],
@@ -27,13 +30,25 @@ class Compare extends Duplex {
         //     develop: ['/']
         // }
 
-        this.queue((next) => {
-            this.compare(screenshots).then(() => next())
-        })
+        // {
+        //     original: '/path/original.png',
+        //     comparison: '/path/comparison.png'
+        // }
+
+        //this.compare(screenshots)
+
+        callback();
     }
 
-    compare(screenshots: comparisonInterface): any {
-        
+
+
+    compare(screenshots: any): any {
+
+        // this.queue.push((next) => {
+
+
+        // })
+
     }
 
 }

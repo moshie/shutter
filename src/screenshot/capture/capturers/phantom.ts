@@ -25,7 +25,7 @@ export default class Phantom implements CapturerInterface {
      * Paths successfully captured
      * @type {string[]}
      */
-    paths: string[] = []
+    paths: any = {}
 
     /**
      * Path to the phantomjs executable
@@ -65,7 +65,7 @@ export default class Phantom implements CapturerInterface {
             phantom.stdout.on('data', (data: NodeBuffer) => {
                 var out: string = data.toString('utf8')
                 if (isJson(out)) {
-                    this.paths = JSON.parse(out)
+                    this.paths[environment] = JSON.parse(out)
                 } else {
                     // Verbose
                     console.log(out)
@@ -77,7 +77,7 @@ export default class Phantom implements CapturerInterface {
                 reject('Error: ' + message)
             })
 
-            phantom.on('close', (code: number) => resolve(this.paths))
+            phantom.on('close', (code: number) => resolve(this.paths[environment]))
         })
     }
 

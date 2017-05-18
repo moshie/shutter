@@ -81,7 +81,7 @@ var renderPage = function(page){
 
     var id = sanitizePath(URLS[index]);
     var filename = `${fs.workingDirectory}/${environment}/${id}_${SCREENSHOT_WIDTH}x${pageHeight}.png`
-    filepaths.push(filename);
+    filepaths.push(`${environment}/${id}_${SCREENSHOT_WIDTH}x${pageHeight}.png`);
     page.render(filename);
 }
 
