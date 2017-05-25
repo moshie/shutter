@@ -12,6 +12,7 @@ import { Duplex } from 'stream'
 import { optionsInterface, environmentsInterface } from '../screenshot/interfaces'
 
 import Screenshot from '../screenshot'
+import Validator from './validator'
 
 /**
  * Handle CLI Screenshots
@@ -21,7 +22,12 @@ import Screenshot from '../screenshot'
  */
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): Duplex {
 
-    const environments: environmentsInterface = sanitize(rawEnvironments)
+    const validator: Validator = new Validator(rawEnvironments);
+    if (!validator.valid) {
+        // Handle error
+    }
+
+    const environments: environmentsInterface = sanitize()
 
     const screenshot: Screenshot = new Screenshot(environments, options)
 
