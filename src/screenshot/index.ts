@@ -53,7 +53,9 @@ class Screenshot {
         const divider: FileDivider = new FileDivider(this.options.directory)
         const capture: Capture = new Capture(this.environments, this.options.directory, this.options.concurrency)
 
-        return source.pipe(collector).pipe(divider).pipe(capture)
+        return source.pipe(collector).pipe(divider).pipe(capture).on('error', (e) => {
+            console.log(e);
+        });
     }
 
     /**

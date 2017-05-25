@@ -1,7 +1,7 @@
 
 export default function validation(domains: string[]) {
 
-	if (domains instanceof Array && domains.length === 0) {
+	if (Array.isArray(domains) && !domains.length) {
 		throw new Error('Please specify environments to screenshot (master=http://www.example.com)')
 	}
 
@@ -17,7 +17,7 @@ export default function validation(domains: string[]) {
 export function hasEnv(domain: string = ''): boolean {
     let [environment, url] = domain.split('=')
 
-    return !environment.length || !url.length
+    return !!environment.length && !!url.length
 }
 
 export function hasSymbols(domain: string = ''): boolean {
@@ -31,9 +31,8 @@ export function isInvalid(domain: string = ''): boolean {
 	let equalsMatches: null|string[] = domain.match(/(\=)/g)
 
 	return equalsMatches === null || 
-		domain.indexOf('=') === -1 || 
 		equalsMatches.length > 1 || 
 		hasSymbols(domain) || 
-		hasEnv(domain)
+		!hasEnv(domain)
 }
 
