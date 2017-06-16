@@ -13,6 +13,7 @@ import { optionsInterface, environmentsInterface } from '../screenshot/interface
 
 import Screenshot from '../screenshot'
 import Validator from './validator'
+import Sanitizer from './sanitizer'
 
 /**
  * Handle CLI Screenshots
@@ -22,16 +23,17 @@ import Validator from './validator'
  */
 export function handleScreenshots(rawEnvironments: string[], options: optionsInterface): Duplex {
 
-    const validator: Validator = new Validator(rawEnvironments);
+    const validator: Validator = new Validator(rawEnvironments)
     if (!validator.valid) {
-        // Handle error
+        // Handle error bag
+        console.log(validator.bag)
+        process.exit(1)
     }
 
-    const environments: environmentsInterface = sanitize()
+    const sanitizer: Sanitizer = new Sanitizer(rawEnvironments)
+    const screenshot: Screenshot = new Screenshot(sanitizer.sanitized, options)
 
-    const screenshot: Screenshot = new Screenshot(environments, options)
-
-    return screenshot.capture();
+    return screenshot.capture()
 }
 
 /**

@@ -1,28 +1,81 @@
 "use strict"
 
-import validation from './validation'
 import { environmentsInterface } from '../screenshot/interfaces'
 
-function sanitize(rawEnvironments: string[]) {
+class Sanitizer {
 
-	try {
-		validation(rawEnvironments)
-	} catch (error) {
-		console.log(error.message) // TODO: Swap out for error handler
-		process.exit(1)
-	}
+    /**
+     * Environments
+     * 
+     * @type {string[]}
+     */
+    environments: string[]
 
-    let sanitized: environmentsInterface = {};
+    /**
+     * Sanatized environment data
+     * 
+     * @type {environmentsInterface}
+     */
+    data: environmentsInterface = {}
 
-    for (var i = 0; i < rawEnvironments.length; i++) {
-        // Must count up!
-        let [environment, domain] = rawEnvironments[i].split('=')
-        domain = /^(https?)/.test(domain) ? domain : `http://${domain}`
-        domain = domain[domain.length-1] == '/' ? domain : `${domain}/`
-        sanitized[environment] = domain
+    /**
+     * Sanitizer constructor
+     * 
+     * @param {string[]}
+     */
+    constructor (environments: string[]) {
+        this.environments = environments
+        this.sanitize()
     }
 
-    return sanitized
+    /**
+     * Sanatize environments
+     */
+    sanitize () {
+        this.environments = this.removeDuplicates()
+        for (var i = 0; i < this.environments.length; i++) {
+            let [env, domain] = this.environments[i].split('=')
+            this.data[env] = this.addTrailingSlash(
+                this.addProtocol(domain)
+            )
+        }
+    }
+
+    /**
+     * Check and remove duplicate environments
+     */
+    removeDuplicates () {
+        let envs: string[] = this.environments.map((elem) => elem.split('=')[0])
+        return this.environments.filter((elem, index, arr) => index == envs.indexOf(elem.split('=')[0]))
+    }
+
+    /**
+     * Add a trailing slash to the domain
+     * 
+     * @param  {string}
+     * @return {string}
+     */
+    addTrailingSlash (domain: string): string {
+        return domain[domain.length - 1] == '/' ? domain : `${domain}/`
+    }
+
+    /**
+     * Add a protocol to the domain
+     * 
+     * @param  {string}
+     * @return {string}
+     */
+    addProtocol (domain: string): string {
+        return /^(https?)/.test(domain) ? domain : `http://${domain}`
+    }
+
+    /**
+     * Get the sanitized data
+     */
+    get sanitized (): environmentsInterface {
+        return this.data
+    }
+
 }
 
-export default sanitize
+export default Sanitizer
