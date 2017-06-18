@@ -32,7 +32,7 @@ class Sanitizer {
      * Sanatize environments
      */
     sanitize () {
-        this.environments = this.removeDuplicates()
+        this.environments = this.removeDuplicates();
         for (var i = 0; i < this.environments.length; i++) {
             let [env, domain] = this.environments[i].split('=')
             this.data[env] = this.addTrailingSlash(

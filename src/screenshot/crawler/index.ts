@@ -68,8 +68,11 @@ class Crawler extends Readable {
 
         tr = this.getHyperLink(tr)
 
-        req.pipe(tr)
+        req.pipe(tr).on('error', (e) => {
+            console.log(e)
+        })
         tr.on('end', () => next())
+        tr.on('error', (e) => console.log(e))
     }
 
     /**
