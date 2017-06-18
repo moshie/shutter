@@ -1,10 +1,9 @@
 import * as chai from 'chai';
 const should = chai.should();
 const expect = chai.expect;
-const assert = require('assert');
 import Sanitizer from './sanitizer';
 
-describe('#Sanitizer', () => {
+describe('#Sanitizer', function () {
 
     it('Should not have duplicates', function () {
         let sanitizer = new Sanitizer(['master=example.com', 'master=example.com'])

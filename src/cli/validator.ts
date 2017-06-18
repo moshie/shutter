@@ -33,7 +33,7 @@ class Validator {
         this.checkEmpty()
         for (var i = this.environments.length - 1; i >= 0; i--) {
             let environment: string = this.environments[i];
-            this.hasEquals(environment)
+            if (this.hasEquals(environment)) continue;
             this.hasSymbols(environment)
             this.hasEnvironment(environment)
         }
@@ -64,7 +64,7 @@ class Validator {
      */
     hasSymbols(environment: string) {
         const [env, url] = environment.split('='),
-            symbolsRegex = /[!-/ :-@ \[-` {-~]/g,
+            symbolsRegex = /[!-/ :-@ \[-`£§± {-~]/g,
             hasSymbols = symbolsRegex.test(env);
         
         if (hasSymbols) {
