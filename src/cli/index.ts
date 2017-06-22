@@ -45,6 +45,11 @@ export function handleScreenshots(rawEnvironments: string[], options: optionsInt
  */
 export function handleCompare(original: string, comparison: string, options: optionsInterface): any {
 
+    // Url or file path?
+    // if (original & comparison are filepaths) {
+        // stream the file paths to compare
+    // }
+
     const compare: Compare = new Compare(options)
 
     const screenshot = handleScreenshots([

@@ -41,4 +41,16 @@ describe('#Validator', function () {
         }
     })
 
+    it('should have one equals', function () {
+        let validator = new Validator(['mas=ter=example.com'])
+        expect(validator.bag).to.be.an('array')
+        expect(validator.bag[0]).to.deep.equal({
+            title: 'Oops!',
+            message: 'Please provide an equals between your environment and domain.'
+        })
+        expect(validator.hasEquals('mas=ter=example.com')).to.be.a('boolean')
+        expect(validator.hasEquals('mas=ter=example.com')).to.be.true
+        expect(validator.hasEquals('master=example.com')).to.be.false
+    })
+
 })
