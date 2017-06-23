@@ -63,14 +63,13 @@ class Crawler extends Readable {
      * @param {Function} next
      */
     crawl(url: string, next: () => void = () => { }): void {
-        let req = request({ url, headers: { 'User-Agent': this.userAgent } })
+        let req = request({ url, agentOptions: { keepAlive: true }, headers: { 'User-Agent': this.userAgent } })
         let tr = trumpet()
 
         tr = this.getHyperLink(tr)
 
-        req.pipe(tr).on('error', (e) => {
-            console.log(e)
-        })
+        req.pipe(tr)
+        req.on('error', (e) => console.log(e))
         tr.on('end', () => next())
         tr.on('error', (e) => console.log(e))
     }
