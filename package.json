@@ -9,7 +9,7 @@
     "compile": "tsc -p ./tsconfig.json && tsc -p ./src/screenshot/capture/capturers/phantom/tsconfig.json",
     "compile:watch": "tsc -w",
     "prepublish": "npm run compile",
-    "start": "node dist/index.js"
+    "start": "node dist/bin/index.js"
   },
   "keywords": [
     "screenshot",

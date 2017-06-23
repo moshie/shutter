@@ -1,19 +1,14 @@
 "use strict"
 
-import * as Promise from 'bluebird'
-
-import sanitize from './sanitizer'
-
-import Compare from '../compare'
-import isDirectory from '../utilities/is-directory'
-
 import { Duplex } from 'stream'
-
-import { optionsInterface, environmentsInterface } from '../screenshot/interfaces'
+import * as Promise from 'bluebird'
 
 import Screenshot from '../screenshot'
 import Validator from './validator'
 import Sanitizer from './sanitizer'
+import Compare from '../compare'
+
+import { optionsInterface, environmentsInterface } from '../screenshot/interfaces'
 
 /**
  * Handle CLI Screenshots
